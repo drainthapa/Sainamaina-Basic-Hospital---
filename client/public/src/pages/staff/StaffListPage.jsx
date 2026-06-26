@@ -34,7 +34,7 @@ export default function StaffListPage() {
         </div>
       </div>
 
-      <div className="auto-container" style={{ padding: '30px 0' }}>
+      <div className="auto-container" style={{ padding: '30px ' }}>
         <table className="table table-bordered table-hover staff-table">
           <thead>
             <tr>

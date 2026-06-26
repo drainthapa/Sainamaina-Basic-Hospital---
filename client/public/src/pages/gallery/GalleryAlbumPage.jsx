@@ -41,7 +41,7 @@ export default function GalleryAlbumPage() {
         </div>
       </div>
 
-      <div className="auto-container" style={{ padding: '30px 0' }}>
+      <div className="auto-container" style={{ padding: '30px' }}>
         <div className="row">
           {album.media.map((item, i) => (
             <div className="gallery-block col-md-3 col-sm-6 col-xs-12" key={item.id}>

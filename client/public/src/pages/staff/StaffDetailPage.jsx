@@ -34,7 +34,7 @@ export default function StaffDetailPage() {
         </div>
       </div>
 
-      <div className="auto-container" style={{ padding: '30px 0' }}>
+      <div className="auto-container" style={{ padding: '30px' }}>
         <div className="row">
           <div className="col-md-3">
             {staff.photo_url && <img src={fileUrl(staff.photo_url)} alt={staff.full_name} style={{ width: '100%', borderRadius: 8 }} />}

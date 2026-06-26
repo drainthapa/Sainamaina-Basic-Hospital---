@@ -9,6 +9,7 @@ import StaticPage from './pages/about/StaticPage';
 import DepartmentListPage from './pages/departments/DepartmentListPage';
 import DepartmentDetailPage from './pages/departments/DepartmentDetailPage';
 import ServiceListPage from './pages/services/ServiceListPage';
+import ServiceDetailPage from './pages/services/ServiceDetailPage';
 import StaffListPage from './pages/staff/StaffListPage';
 import StaffDetailPage from './pages/staff/StaffDetailPage';
 import NewsListPage from './pages/news/NewsListPage';
@@ -30,6 +31,7 @@ export default function App() {
           <Route path="departments" element={<DepartmentListPage />} />
           <Route path="departments/:slug" element={<DepartmentDetailPage />} />
           <Route path="services" element={<ServiceListPage />} />
+          <Route path="services/:slug" element={<ServiceDetailPage />} />
 
           <Route path="staff" element={<StaffListPage />} />
           <Route path="staff/:id" element={<StaffDetailPage />} />

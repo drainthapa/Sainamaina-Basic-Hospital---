@@ -38,7 +38,7 @@ export default function GalleryListPage() {
         </div>
       </div>
 
-      <div className="auto-container" style={{ padding: '30px 0' }}>
+      <div className="auto-container" style={{ padding: '30px' }}>
         {isLoading ? <p>{t('common.loading')}</p> : albums.length === 0 ? <p>{t('common.detailsNotAvailable')}</p> : (
           <div className="row">
             {albums.map((album) => (

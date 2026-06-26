@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { servicesApi } from '../../api/client';
 import { useLanguage } from '../../context/LanguageContext';
+import { getServiceIcon } from '../../utils/serviceIcons';
+import './Services.css';
 
 export default function ServiceListPage() {
   const { t } = useTranslation();
@@ -34,21 +36,36 @@ export default function ServiceListPage() {
         </div>
       </div>
 
-      <div className="auto-container" style={{ padding: '30px 0' }}>
-        {isLoading ? <p>{t('common.loading')}</p> : (
+      <div className="auto-container" style={{ padding: '40px' }}>
+        {isLoading ? (
+          <p>{t('common.loading')}</p>
+        ) : items.length === 0 ? (
+          <p>{t('common.detailsNotAvailable')}</p>
+        ) : (
           <>
             {emergency.length > 0 && (
-              <>
-                <h3 style={{ color: '#c0392b' }}>{t('home.emergencyServices')}</h3>
-                <div className="row" style={{ marginBottom: 24 }}>
-                  {emergency.map((service) => <ServiceCard key={service.id} service={service} emergency field={field} />)}
+              <div className="services-group services-group-emergency">
+                <h3 className="services-group-title services-group-title-emergency">
+                  <i className="fa fa-ambulance" /> {t('home.emergencyServices')}
+                </h3>
+                <div className="row">
+                  {emergency.map((service) => (
+                    <ServiceCard key={service.id} service={service} emergency field={field} />
+                  ))}
                 </div>
-              </>
+              </div>
             )}
-            <h3>{t('home.otherServices')}</h3>
-            <div className="row">
-              {regular.map((service) => <ServiceCard key={service.id} service={service} field={field} />)}
-            </div>
+
+            {regular.length > 0 && (
+              <div className="services-group">
+                <h3 className="services-group-title">{t('home.otherServices')}</h3>
+                <div className="row">
+                  {regular.map((service) => (
+                    <ServiceCard key={service.id} service={service} field={field} />
+                  ))}
+                </div>
+              </div>
+            )}
           </>
         )}
       </div>
@@ -58,23 +75,22 @@ export default function ServiceListPage() {
 
 function ServiceCard({ service, emergency, field }) {
   const departmentName = field({ name_en: service.department_name_en, name_np: service.department_name_np }, 'name');
+  const icon = getServiceIcon(service);
+  const description = field(service, 'description');
+
   return (
-    <div className="col-md-4 col-sm-6" style={{ marginBottom: 20 }}>
-      <div
-        style={{
-          border: `1px solid ${emergency ? '#e6b3ad' : '#eee'}`,
-          background: emergency ? '#fdf3f1' : '#fff',
-          borderRadius: 8,
-          padding: 18,
-          height: '100%',
-        }}
-      >
-        <h4>{field(service, 'name')}</h4>
-        {departmentName && (
-          <div style={{ fontSize: 13, color: '#888', marginBottom: 6 }}>{departmentName}</div>
-        )}
-        {field(service, 'description') && <p style={{ fontSize: 14 }}>{field(service, 'description')}</p>}
-      </div>
+    <div className="col-md-4 col-sm-6 col-xs-12">
+      <Link to={`/services/${service.slug}`} className={`service-card ${emergency ? 'service-card-emergency' : ''}`}>
+        <div className="service-card-icon">
+          <i className={`fa ${icon}`} />
+        </div>
+        <h4 className="service-card-title">{field(service, 'name')}</h4>
+        {departmentName && <div className="service-card-department">{departmentName}</div>}
+        {description && <p className="service-card-text">{description}</p>}
+        <span className="service-card-link">
+          <i className="fa fa-arrow-right" />
+        </span>
+      </Link>
     </div>
   );
 }

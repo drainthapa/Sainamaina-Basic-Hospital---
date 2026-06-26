@@ -51,7 +51,7 @@ export default function StaticPage() {
         </div>
       </div>
 
-      <div className="auto-container" style={{ padding: '30px 0' }}>
+      <div className="auto-container" style={{ padding: '30px ' }}>
         <section className="contact-info-section">
           <div className="row clearfix">
             <div className="col-lg-9 col-md-9 col-sm-12 col-xs-12" id="content">
