@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import { useAuth } from '../../context/AuthContext';
 import Button from '../../components/Button';
+import LanguageToggle from '../../components/LanguageToggle';
 import { Field, TextInput } from '../../components/FormField';
 import './Login.css';
 
@@ -10,6 +12,7 @@ export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -23,9 +26,9 @@ export default function Login() {
       await login(email, password);
       const redirectTo = location.state?.from?.pathname || '/';
       navigate(redirectTo, { replace: true });
-      toast.success('Welcome back!');
+      toast.success(t('auth.welcomeBack'));
     } catch (err) {
-      setError(err.response?.data?.message || 'Login failed. Check your email and password.');
+      setError(err.response?.data?.message || t('auth.loginFailed'));
     } finally {
       setIsLoading(false);
     }
@@ -33,15 +36,18 @@ export default function Login() {
 
   return (
     <div className="login-page">
+      <div className="login-lang-row">
+        <LanguageToggle />
+      </div>
       <form className="login-card" onSubmit={handleSubmit}>
         <div className="login-brand">
           <h1>सैनामैना आधारभुत अस्पताल</h1>
-          <p>CMS Admin Panel</p>
+          <p>{t('app.title')}</p>
         </div>
 
         {error && <div className="login-error">{error}</div>}
 
-        <Field label="Email" required>
+        <Field label={t('auth.email')} required>
           <TextInput
             type="email"
             value={email}
@@ -50,7 +56,7 @@ export default function Login() {
             required
           />
         </Field>
-        <Field label="Password" required>
+        <Field label={t('auth.password')} required>
           <TextInput
             type="password"
             value={password}
@@ -61,7 +67,7 @@ export default function Login() {
         </Field>
 
         <Button type="submit" isLoading={isLoading} style={{ width: '100%', marginTop: 8 }}>
-          Log in
+          {t('auth.login')}
         </Button>
       </form>
     </div>

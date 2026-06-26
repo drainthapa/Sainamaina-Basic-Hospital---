@@ -1,0 +1,31 @@
+.lang-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+  padding: 3px 8px;
+  cursor: pointer;
+  font-size: 12px;
+  color: #fff;
+  line-height: 1.4;
+}
+
+.lang-toggle:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.lang-option {
+  opacity: 0.55;
+  transition: opacity 0.15s;
+}
+
+.lang-option.active {
+  opacity: 1;
+  font-weight: 600;
+}
+
+.lang-divider {
+  opacity: 0.4;
+}

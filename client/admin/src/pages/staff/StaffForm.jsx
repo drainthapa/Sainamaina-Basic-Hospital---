@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useForm, useFieldArray } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import { Plus, Trash2 } from 'lucide-react';
 import { staffApi, departmentsApi } from '../../api/modules';
@@ -8,20 +9,13 @@ import { Field, TextInput, TextArea, Select, Checkbox } from '../../components/F
 import FileUpload from '../../components/FileUpload';
 import Button from '../../components/Button';
 
-const STAFF_TYPES = [
-  { value: 'doctor', label: 'Doctor' },
-  { value: 'nursing', label: 'Nursing' },
-  { value: 'administrative', label: 'Administrative' },
-  { value: 'technical', label: 'Technical' },
-  { value: 'support', label: 'Support' },
-];
-
-const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const STAFF_TYPES = ['doctor', 'nursing', 'administrative', 'technical', 'support'];
 
 export default function StaffForm() {
   const { id } = useParams();
   const isEdit = id && id !== 'new';
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(isEdit);
   const [isSaving, setIsSaving] = useState(false);
   const [departments, setDepartments] = useState([]);
@@ -37,6 +31,7 @@ export default function StaffForm() {
 
   const { fields, append, remove } = useFieldArray({ control, name: 'schedules' });
   const staffType = watch('staff_type');
+  const days = t('staff.days', { returnObjects: true });
 
   useEffect(() => {
     departmentsApi.list({ limit: 100 }).then((res) => setDepartments(res.data.data));
@@ -55,10 +50,10 @@ export default function StaffForm() {
       });
       setIsLoading(false);
     }).catch(() => {
-      toast.error('Failed to load staff member');
+      toast.error(t('common.loadFailed'));
       navigate('/staff');
     });
-  }, [id, isEdit, navigate, reset]);
+  }, [id, isEdit, navigate, reset, t]);
 
   const onSubmit = async (data) => {
     setIsSaving(true);
@@ -66,101 +61,101 @@ export default function StaffForm() {
     try {
       if (isEdit) {
         await staffApi.update(id, payload);
-        toast.success('Staff member updated');
+        toast.success(t('staff.updated'));
       } else {
         await staffApi.create(payload);
-        toast.success('Staff member created');
+        toast.success(t('staff.created'));
       }
       navigate('/staff');
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Save failed');
+      toast.error(err.response?.data?.message || t('common.saveFailed'));
     } finally {
       setIsSaving(false);
     }
   };
 
-  if (isLoading) return <div className="table-state">Loading…</div>;
+  if (isLoading) return <div className="table-state">{t('common.loading')}</div>;
 
   return (
     <div>
       <div className="page-header">
-        <div><h1>{isEdit ? 'Edit staff member' : 'New staff member'}</h1></div>
+        <div><h1>{isEdit ? t('staff.editStaff') : t('staff.newStaff')}</h1></div>
       </div>
 
       <form className="surface-card" style={{ padding: 24 }} onSubmit={handleSubmit(onSubmit)}>
         <div className="form-grid">
-          <Field label="Full name" required error={errors.full_name?.message}>
-            <TextInput {...register('full_name', { required: 'Required' })} />
+          <Field label={t('staff.fullName')} required error={errors.full_name?.message}>
+            <TextInput {...register('full_name', { required: t('common.required') })} />
           </Field>
-          <Field label="Staff type" required>
+          <Field label={t('staff.staffType')} required>
             <Select {...register('staff_type')}>
-              {STAFF_TYPES.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
+              {STAFF_TYPES.map((value) => <option key={value} value={value}>{t(`staff.types.${value}`)}</option>)}
             </Select>
           </Field>
 
-          <Field label="Designation (English)" required error={errors.designation_en?.message}>
-            <TextInput {...register('designation_en', { required: 'Required' })} />
+          <Field label={t('staff.designationEn')} required error={errors.designation_en?.message}>
+            <TextInput {...register('designation_en', { required: t('common.required') })} />
           </Field>
-          <Field label="Designation (Nepali)" required error={errors.designation_np?.message}>
-            <TextInput {...register('designation_np', { required: 'Required' })} />
+          <Field label={t('staff.designationNp')} required error={errors.designation_np?.message}>
+            <TextInput {...register('designation_np', { required: t('common.required') })} />
           </Field>
 
-          <Field label="Department">
+          <Field label={t('staff.department')}>
             <Select {...register('department_id')}>
-              <option value="">— None —</option>
+              <option value="">{t('common.none')}</option>
               {departments.map((d) => <option key={d.id} value={d.id}>{d.name_en}</option>)}
             </Select>
           </Field>
-          <Field label="Qualification" hint="e.g. MBBS, MD (Internal Medicine)">
+          <Field label={t('staff.qualification')} hint={t('staff.qualificationHint')}>
             <TextInput {...register('qualification')} />
           </Field>
 
           {staffType === 'doctor' && (
-            <Field label="Specialization" hint="Doctor-specific field">
+            <Field label={t('staff.specialization')} hint={t('staff.specializationHint')}>
               <TextInput {...register('specialization')} />
             </Field>
           )}
 
-          <Field label="Email">
+          <Field label={t('staff.email')}>
             <TextInput type="email" {...register('email')} />
           </Field>
-          <Field label="Phone">
+          <Field label={t('staff.phone')}>
             <TextInput {...register('phone')} />
           </Field>
 
-          <Field label="Biography (English)" hint="Optional">
+          <Field label={t('staff.biographyEn')} hint={t('common.optional')}>
             <TextArea {...register('biography_en')} />
           </Field>
-          <Field label="Biography (Nepali)" hint="Optional">
+          <Field label={t('staff.biographyNp')} hint={t('common.optional')}>
             <TextArea {...register('biography_np')} />
           </Field>
 
-          <Field label="Photo">
+          <Field label={t('staff.photo')}>
             <FileUpload value={watch('photo_url')} accept="image/*" onChange={(url) => setValue('photo_url', url)} />
           </Field>
 
           <div className="form-grid-full">
-            <Checkbox label="Published (visible on the public site)" {...register('is_published')} />
+            <Checkbox label={t('departments.publishedHint')} {...register('is_published')} />
           </div>
         </div>
 
-        <h3 style={{ marginTop: 24 }}>Weekly availability</h3>
+        <h3 style={{ marginTop: 24 }}>{t('staff.weeklyAvailability')}</h3>
         <p style={{ color: 'var(--color-text-muted)', fontSize: 13, marginTop: -8 }}>
-          Optional. Mainly used for doctors, but works for any staff member.
+          {t('staff.weeklyAvailabilityHint')}
         </p>
 
         {fields.map((field, index) => (
           <div key={field.id} className="form-grid" style={{ alignItems: 'end', marginBottom: 4 }}>
-            <Field label="Day">
+            <Field label={t('staff.day')}>
               <Select {...register(`schedules.${index}.day_of_week`, { valueAsNumber: true })}>
-                {DAYS.map((day, i) => <option key={i} value={i}>{day}</option>)}
+                {days.map((day, i) => <option key={i} value={i}>{day}</option>)}
               </Select>
             </Field>
             <div style={{ display: 'flex', gap: 10 }}>
-              <Field label="Start time">
+              <Field label={t('staff.startTime')}>
                 <TextInput type="time" {...register(`schedules.${index}.start_time`)} />
               </Field>
-              <Field label="End time">
+              <Field label={t('staff.endTime')}>
                 <TextInput type="time" {...register(`schedules.${index}.end_time`)} />
               </Field>
               <Button type="button" variant="ghost" size="sm" onClick={() => remove(index)} style={{ marginTop: 30 }}>
@@ -173,12 +168,12 @@ export default function StaffForm() {
           type="button" variant="secondary" size="sm"
           onClick={() => append({ day_of_week: 0, start_time: '09:00', end_time: '17:00' })}
         >
-          <Plus size={14} /> Add day
+          <Plus size={14} /> {t('staff.addDay')}
         </Button>
 
         <div className="row-actions" style={{ justifyContent: 'flex-start', marginTop: 24 }}>
-          <Button type="submit" isLoading={isSaving}>Save</Button>
-          <Button type="button" variant="secondary" onClick={() => navigate('/staff')}>Cancel</Button>
+          <Button type="submit" isLoading={isSaving}>{t('common.save')}</Button>
+          <Button type="button" variant="secondary" onClick={() => navigate('/staff')}>{t('common.cancel')}</Button>
         </div>
       </form>
     </div>

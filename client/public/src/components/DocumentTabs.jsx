@@ -1,18 +1,22 @@
 import { useState } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from 'swiper/modules';
+import { useTranslation } from 'react-i18next';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import { fileUrl } from '../api/client';
+import { useLanguage } from '../context/LanguageContext';
 
 const TABS = [
-  { key: 'policy', label: 'नीति' },
-  { key: 'act', label: 'ऐन' },
-  { key: 'guideline', label: 'नियमावली' },
-  { key: 'action_plan', label: 'कार्यविधी / कार्ययोजना' },
+  { key: 'policy', labelKey: 'downloads.policies' },
+  { key: 'act', labelKey: 'downloads.acts' },
+  { key: 'guideline', labelKey: 'downloads.guidelines' },
+  { key: 'action_plan', labelKey: 'downloads.actionPlan' },
 ];
 
 export default function DocumentTabs({ documentsByType }) {
+  const { t } = useTranslation();
+  const { field } = useLanguage();
   const [activeTab, setActiveTab] = useState(TABS[0].key);
   const items = documentsByType[activeTab] || [];
 
@@ -31,7 +35,7 @@ export default function DocumentTabs({ documentsByType }) {
                       onClick={(e) => { e.preventDefault(); setActiveTab(tab.key); }}
                       role="tab"
                     >
-                      {tab.label}
+                      {t(tab.labelKey)}
                     </a>
                   </li>
                 ))}
@@ -39,7 +43,7 @@ export default function DocumentTabs({ documentsByType }) {
               <div className="tab-content">
                 <div className="tab-pane active in" role="tabpanel">
                   {items.length === 0 ? (
-                    <p style={{ padding: '20px 0', color: '#888' }}>छिट्टै आउंदै छ!</p>
+                    <p style={{ padding: '20px 0', color: '#888' }}>{t('common.comingSoon')}</p>
                   ) : (
                     <Swiper
                       modules={[Navigation]}
@@ -57,7 +61,7 @@ export default function DocumentTabs({ documentsByType }) {
                         <SwiperSlide key={doc.id}>
                           <a href={fileUrl(doc.file_url)} target="_blank" rel="noreferrer" className="report-slider-block2 media-box format-standard">
                             <img src="/assets/images/actandrules/cover.jpg" alt="" />
-                            <p>{doc.title_np}</p>
+                            <p>{field(doc, 'title')}</p>
                           </a>
                         </SwiperSlide>
                       ))}

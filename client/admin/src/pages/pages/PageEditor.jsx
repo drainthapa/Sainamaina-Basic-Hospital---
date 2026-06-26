@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
@@ -11,6 +12,7 @@ import Button from '../../components/Button';
 export default function PageEditor() {
   const { slug } = useParams();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -23,42 +25,42 @@ export default function PageEditor() {
       reset(res.data.data);
       setIsLoading(false);
     }).catch(() => {
-      toast.error('Failed to load page');
+      toast.error(t('common.loadFailed'));
       navigate('/pages');
     });
-  }, [slug, navigate, reset]);
+  }, [slug, navigate, reset, t]);
 
   const onSubmit = async (data) => {
     setIsSaving(true);
     try {
       await pagesApi.update(slug, data);
-      toast.success('Page updated');
+      toast.success(t('pages.updated'));
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Save failed');
+      toast.error(err.response?.data?.message || t('common.saveFailed'));
     } finally {
       setIsSaving(false);
     }
   };
 
-  if (isLoading) return <div className="table-state">Loading…</div>;
+  if (isLoading) return <div className="table-state">{t('common.loading')}</div>;
 
   return (
     <div>
       <div className="page-header">
-        <div><h1>Edit page</h1><div className="subtitle">/{slug}</div></div>
+        <div><h1>{t('pages.editPage')}</h1><div className="subtitle">/{slug}</div></div>
       </div>
 
       <form className="surface-card" style={{ padding: 24 }} onSubmit={handleSubmit(onSubmit)}>
         <div className="form-grid">
-          <Field label="Title (English)">
+          <Field label={t('common.titleEn')}>
             <TextInput {...register('title_en')} />
           </Field>
-          <Field label="Title (Nepali)">
+          <Field label={t('common.titleNp')}>
             <TextInput {...register('title_np')} />
           </Field>
         </div>
 
-        <Field label="Content (English)">
+        <Field label={t('pages.contentEn')}>
           <Controller
             name="content_en"
             control={control}
@@ -66,7 +68,7 @@ export default function PageEditor() {
           />
         </Field>
 
-        <Field label="Content (Nepali)">
+        <Field label={t('pages.contentNp')}>
           <Controller
             name="content_np"
             control={control}
@@ -75,17 +77,17 @@ export default function PageEditor() {
         </Field>
 
         <div className="form-grid">
-          <Field label="Meta title" hint="SEO">
+          <Field label={t('pages.metaTitle')} hint={t('pages.seo')}>
             <TextInput {...register('meta_title')} />
           </Field>
-          <Field label="Meta description" hint="SEO">
+          <Field label={t('pages.metaDescription')} hint={t('pages.seo')}>
             <TextInput {...register('meta_description')} />
           </Field>
         </div>
 
         <div className="row-actions" style={{ justifyContent: 'flex-start', marginTop: 8 }}>
-          <Button type="submit" isLoading={isSaving}>Save</Button>
-          <Button type="button" variant="secondary" onClick={() => navigate('/pages')}>Cancel</Button>
+          <Button type="submit" isLoading={isSaving}>{t('common.save')}</Button>
+          <Button type="button" variant="secondary" onClick={() => navigate('/pages')}>{t('common.cancel')}</Button>
         </div>
       </form>
     </div>

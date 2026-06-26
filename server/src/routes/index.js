@@ -13,6 +13,7 @@ router.use('/uploads', require('./uploadRoutes'));
 router.use('/users', require('./userRoutes'));
 router.use('/contact-submissions', require('./contactRoutes'));
 router.use('/services', require('./serviceRoutes'));
+router.use('/audit-logs', require('./auditLogRoutes'));
 
 router.get('/health', (req, res) => {
   res.json({ success: true, message: 'API is healthy', timestamp: new Date().toISOString() });

@@ -1,6 +1,9 @@
 import { fileUrl } from '../api/client';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function VipMembers({ members }) {
+  const { field } = useLanguage();
+
   return (
     <div className="team-card-holder">
       <div className="row">
@@ -17,7 +20,7 @@ export default function VipMembers({ members }) {
                 </div>
                 <div className="vip-info">
                   <h2 className="name">{member.full_name}</h2>
-                  <h4 className="post-contact">{member.designation_np}</h4>
+                  <h4 className="post-contact">{field(member, 'designation')}</h4>
                   {member.phone && <h4 className="post-contact">{member.phone}</h4>}
                 </div>
               </div>

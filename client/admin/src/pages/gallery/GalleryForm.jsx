@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import { Plus, Trash2 } from 'lucide-react';
 import { galleryApi, uploadApi } from '../../api/modules';
@@ -15,6 +16,7 @@ export default function GalleryForm() {
   const { id } = useParams();
   const isEdit = id && id !== 'new';
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(isEdit);
   const [isSaving, setIsSaving] = useState(false);
   const [media, setMedia] = useState([]);
@@ -37,10 +39,10 @@ export default function GalleryForm() {
       setMedia(data.media || []);
       setIsLoading(false);
     }).catch(() => {
-      toast.error('Failed to load album');
+      toast.error(t('common.loadFailed'));
       navigate('/gallery');
     });
-  }, [id, isEdit, navigate, reset]);
+  }, [id, isEdit, navigate, reset, t]);
 
   const handleAddMediaFiles = async (files) => {
     if (!files || files.length === 0) return;
@@ -60,11 +62,10 @@ export default function GalleryForm() {
         const res = await galleryApi.addMedia(id, uploaded);
         setMedia((m) => [...m, ...res.data.data]);
       } else {
-        // Album not saved yet - keep media in local state, attach on create.
         setMedia((m) => [...m, ...uploaded.map((u, i) => ({ ...u, id: `local-${Date.now()}-${i}` }))]);
       }
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Upload failed');
+      toast.error(err.response?.data?.message || t('common.saveFailed'));
     } finally {
       setIsUploadingMedia(false);
     }
@@ -75,7 +76,7 @@ export default function GalleryForm() {
       try {
         await galleryApi.removeMedia(item.id);
       } catch (err) {
-        toast.error('Failed to remove item');
+        toast.error(t('common.deleteFailed'));
         return;
       }
     }
@@ -87,61 +88,61 @@ export default function GalleryForm() {
     try {
       if (isEdit) {
         await galleryApi.updateAlbum(id, data);
-        toast.success('Album updated');
+        toast.success(t('gallery.updated'));
       } else {
         await galleryApi.createAlbum({ ...data, media });
-        toast.success('Album created');
+        toast.success(t('gallery.created'));
       }
       navigate('/gallery');
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Save failed');
+      toast.error(err.response?.data?.message || t('common.saveFailed'));
     } finally {
       setIsSaving(false);
     }
   };
 
-  if (isLoading) return <div className="table-state">Loading…</div>;
+  if (isLoading) return <div className="table-state">{t('common.loading')}</div>;
 
   return (
     <div>
       <div className="page-header">
-        <div><h1>{isEdit ? 'Edit album' : 'New album'}</h1></div>
+        <div><h1>{isEdit ? t('gallery.editAlbum') : t('gallery.newAlbum')}</h1></div>
       </div>
 
       <form className="surface-card" style={{ padding: 24 }} onSubmit={handleSubmit(onSubmit)}>
         <div className="form-grid">
-          <Field label="Title (English)" required error={errors.title_en?.message}>
-            <TextInput {...register('title_en', { required: 'Required' })} />
+          <Field label={t('common.titleEn')} required error={errors.title_en?.message}>
+            <TextInput {...register('title_en', { required: t('common.required') })} />
           </Field>
-          <Field label="Title (Nepali)" required error={errors.title_np?.message}>
-            <TextInput {...register('title_np', { required: 'Required' })} />
+          <Field label={t('common.titleNp')} required error={errors.title_np?.message}>
+            <TextInput {...register('title_np', { required: t('common.required') })} />
           </Field>
 
-          <Field label="Album type" required>
+          <Field label={t('gallery.albumType')} required>
             <Select {...register('album_type')}>
-              <option value="photo">Photo</option>
-              <option value="video">Video</option>
+              <option value="photo">{t('gallery.photo')}</option>
+              <option value="video">{t('gallery.video')}</option>
             </Select>
           </Field>
-          <Field label="Cover image">
+          <Field label={t('gallery.coverImage')}>
             <FileUpload value={watch('cover_image_url')} accept="image/*" onChange={(url) => setValue('cover_image_url', url)} />
           </Field>
 
-          <Field label="BS date" hint="e.g. १४ फागुन २०७७">
+          <Field label={t('gallery.bsDate')} hint={t('news.bsDateHint')}>
             <TextInput {...register('bs_date')} />
           </Field>
-          <Field label="AD date" required>
+          <Field label={t('gallery.adDate')} required>
             <TextInput type="date" {...register('ad_date', { required: true })} />
           </Field>
 
           <div className="form-grid-full">
-            <Checkbox label="Published (visible on the public site)" {...register('is_published')} />
+            <Checkbox label={t('departments.publishedHint')} {...register('is_published')} />
           </div>
         </div>
 
-        <h3 style={{ marginTop: 8 }}>Photos / videos</h3>
+        <h3 style={{ marginTop: 8 }}>{t('gallery.photosVideos')}</h3>
         <label className="gallery-upload-button">
-          <Plus size={14} /> {isUploadingMedia ? 'Uploading…' : 'Add files'}
+          <Plus size={14} /> {isUploadingMedia ? t('common.uploading') : t('gallery.addFiles')}
           <input
             type="file"
             multiple
@@ -160,17 +161,17 @@ export default function GalleryForm() {
               ) : (
                 <img src={`${FILE_BASE}${item.media_url}`} alt={item.caption_en || ''} />
               )}
-              <button type="button" className="gallery-media-remove" onClick={() => handleRemoveMedia(item)} aria-label="Remove">
+              <button type="button" className="gallery-media-remove" onClick={() => handleRemoveMedia(item)} aria-label={t('common.delete')}>
                 <Trash2 size={13} />
               </button>
             </div>
           ))}
-          {media.length === 0 && <div className="cell-muted" style={{ padding: '12px 0' }}>No media added yet.</div>}
+          {media.length === 0 && <div className="cell-muted" style={{ padding: '12px 0' }}>{t('gallery.noMediaYet')}</div>}
         </div>
 
         <div className="row-actions" style={{ justifyContent: 'flex-start', marginTop: 24 }}>
-          <Button type="submit" isLoading={isSaving}>Save</Button>
-          <Button type="button" variant="secondary" onClick={() => navigate('/gallery')}>Cancel</Button>
+          <Button type="submit" isLoading={isSaving}>{t('common.save')}</Button>
+          <Button type="button" variant="secondary" onClick={() => navigate('/gallery')}>{t('common.cancel')}</Button>
         </div>
       </form>
     </div>

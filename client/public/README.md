@@ -19,11 +19,17 @@ the admin app — run them side by side, they don't conflict).
 
 ## What's converted so far
 
-- **Layout**: Header (utility bar with font-size/print/invert-color/BS date,
-  logo banner, dropdown nav) and Footer (contact info, related government
-  links, embedded map, copyright bar) — ported from the real markup in
-  `news.html`, not the stale `header.html`/`footer.html` template files
-  (verified those aren't actually used by any current page)
+- **Full bilingual support (English / Nepali)** with a toggle in the header
+  utility bar. UI labels are translated via `src/i18n/`; data fields (titles,
+  names, descriptions, etc.) automatically switch via the `field()` helper
+  in `LanguageContext`, which picks `_en`/`_np` based on the active language
+  and falls back to whichever language has content so partially-translated
+  CMS entries never show blank. Preference persists in `localStorage`.
+- **Layout**: Header (utility bar with font-size/print/invert-color/BS date/
+  language toggle, logo banner, dropdown nav) and Footer (contact info,
+  related government links, embedded map, copyright bar) — ported from the
+  real markup in `news.html`, not the stale `header.html`/`footer.html`
+  template files (verified those aren't actually used by any current page)
 - **Homepage**: marquee notice ticker, hero image slider, VIP members
   sidebar, e-governance quick links, intro section, tabbed document
   carousel (Policy/Act/Guideline/Action Plan), photo gallery preview

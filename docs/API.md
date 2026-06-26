@@ -170,6 +170,12 @@ Files are served back at `http://localhost:5000<file_url>` (e.g. `/uploads/169..
 | PUT | `/:id/read` | Bearer | same roles |
 | DELETE | `/:id` | Bearer | same roles |
 
+## Audit logs — `/api/audit-logs` (any logged-in CMS user)
+
+| Method | Path | Notes |
+|---|---|---|
+| GET | `/?limit=20&entity_type=department` | Recent CMS activity (who did what, when) — powers the admin dashboard's activity feed |
+
 ---
 
 ## Example: log in and create a notice

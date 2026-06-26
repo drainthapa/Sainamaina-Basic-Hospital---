@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { pagesApi } from '../../api/modules';
 import DataTable from '../../components/DataTable';
 import Button from '../../components/Button';
@@ -7,6 +8,7 @@ import { Pencil } from 'lucide-react';
 
 export default function PageList() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [rows, setRows] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -18,15 +20,15 @@ export default function PageList() {
   }, []);
 
   const columns = [
-    { key: 'title_en', label: 'Page' },
-    { key: 'slug', label: 'Slug', render: (row) => <code>{row.slug}</code> },
-    { key: 'updated_at', label: 'Last updated', render: (row) => new Date(row.updated_at).toLocaleString() },
+    { key: 'title_en', label: t('pages.page') },
+    { key: 'slug', label: t('pages.slug'), render: (row) => <code>{row.slug}</code> },
+    { key: 'updated_at', label: t('pages.lastUpdated'), render: (row) => new Date(row.updated_at).toLocaleString() },
     {
       key: 'actions', label: '',
       render: (row) => (
         <div className="row-actions">
           <Button variant="ghost" size="sm" onClick={() => navigate(`/pages/${row.slug}`)}>
-            <Pencil size={14} /> Edit
+            <Pencil size={14} /> {t('common.edit')}
           </Button>
         </div>
       ),
@@ -37,8 +39,8 @@ export default function PageList() {
     <div>
       <div className="page-header">
         <div>
-          <h1>Pages</h1>
-          <div className="subtitle">Static content: About, History, Mission, Vision, Organization Structure, Citizen Charter, Hospital Profile</div>
+          <h1>{t('pages.title')}</h1>
+          <div className="subtitle">{t('pages.subtitle')}</div>
         </div>
       </div>
       <div className="surface-card">

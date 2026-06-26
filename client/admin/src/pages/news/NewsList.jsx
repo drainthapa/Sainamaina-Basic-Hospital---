@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import { newsApi } from '../../api/modules';
 import { useListData } from '../../hooks/useListData';
@@ -12,19 +13,12 @@ import Button from '../../components/Button';
 import { Pencil, Trash2 } from 'lucide-react';
 import './News.css';
 
-const MODULE_TABS = [
-  { value: 'news', label: 'News' },
-  { value: 'notice', label: 'Notices' },
-  { value: 'press_release', label: 'Press releases' },
-  { value: 'tender_notice', label: 'Tender notices' },
-  { value: 'health_article', label: 'Health awareness' },
-  { value: 'event', label: 'Events' },
-];
-
+const MODULE_TYPES = ['news', 'notice', 'press_release', 'tender_notice', 'health_article', 'event'];
 const STATUS_TONE = { published: 'success', draft: 'neutral', archived: 'warning' };
 
 export default function NewsList() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { confirm, dialog } = useConfirm();
   const [search, setSearch] = useState('');
   const { rows, total, isLoading, error, params, setParams, reload } = useListData(newsApi.list, {
@@ -32,14 +26,14 @@ export default function NewsList() {
   });
 
   const handleDelete = async (row) => {
-    const ok = await confirm(`Delete "${row.title_en}"? This cannot be undone.`);
+    const ok = await confirm(t('news.deleteConfirm', { name: row.title_en }));
     if (!ok) return;
     try {
       await newsApi.remove(row.id);
-      toast.success('Deleted');
+      toast.success(t('news.deleted'));
       reload();
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Delete failed');
+      toast.error(err.response?.data?.message || t('common.deleteFailed'));
     }
   };
 
@@ -48,20 +42,20 @@ export default function NewsList() {
     : rows;
 
   const columns = [
-    { key: 'title_en', label: 'Title' },
-    { key: 'bs_date', label: 'BS date', render: (row) => row.bs_date || <span className="cell-muted">—</span> },
-    { key: 'ad_date', label: 'AD date', render: (row) => new Date(row.ad_date).toLocaleDateString() },
+    { key: 'title_en', label: t('common.titleEn') },
+    { key: 'bs_date', label: t('news.bsDate'), render: (row) => row.bs_date || <span className="cell-muted">—</span> },
+    { key: 'ad_date', label: t('news.adDate'), render: (row) => new Date(row.ad_date).toLocaleDateString() },
     {
-      key: 'status', label: 'Status',
-      render: (row) => <Badge tone={STATUS_TONE[row.status] || 'neutral'}>{row.status}</Badge>,
+      key: 'status', label: t('common.status'),
+      render: (row) => <Badge tone={STATUS_TONE[row.status] || 'neutral'}>{t(`common.${row.status}`) || row.status}</Badge>,
     },
-    { key: 'views', label: 'Views' },
+    { key: 'views', label: t('news.views') },
     {
       key: 'actions', label: '',
       render: (row) => (
         <div className="row-actions">
           <Button variant="ghost" size="sm" onClick={() => navigate(`/news/${row.id}`)}>
-            <Pencil size={14} /> Edit
+            <Pencil size={14} /> {t('common.edit')}
           </Button>
           <Button variant="ghost" size="sm" onClick={() => handleDelete(row)}>
             <Trash2 size={14} />
@@ -71,26 +65,24 @@ export default function NewsList() {
     },
   ];
 
-  const currentTab = MODULE_TABS.find((t) => t.value === params.module_type);
-
   return (
     <div>
       <div className="page-header">
         <div>
-          <h1>News & notices</h1>
-          <div className="subtitle">Covers news, notices, press releases, tender notices, health awareness articles, and events</div>
+          <h1>{t('news.title')}</h1>
+          <div className="subtitle">{t('news.subtitle')}</div>
         </div>
       </div>
 
       <div className="news-tabs">
-        {MODULE_TABS.map((tab) => (
+        {MODULE_TYPES.map((tabValue) => (
           <button
-            key={tab.value}
+            key={tabValue}
             type="button"
-            className={`news-tab ${tab.value === params.module_type ? 'active' : ''}`}
-            onClick={() => setParams((p) => ({ ...p, module_type: tab.value, offset: 0 }))}
+            className={`news-tab ${tabValue === params.module_type ? 'active' : ''}`}
+            onClick={() => setParams((p) => ({ ...p, module_type: tabValue, offset: 0 }))}
           >
-            {tab.label}
+            {t(`news.tabs.${tabValue}`)}
           </button>
         ))}
       </div>
@@ -98,21 +90,21 @@ export default function NewsList() {
       <Toolbar
         searchValue={search}
         onSearchChange={setSearch}
-        searchPlaceholder="Search by title…"
+        searchPlaceholder={t('news.searchPlaceholder')}
         filters={(
           <select
             className="toolbar-filter-select"
             value={params.status || ''}
             onChange={(e) => setParams((p) => ({ ...p, status: e.target.value || undefined, offset: 0 }))}
           >
-            <option value="">All statuses</option>
-            <option value="published">Published</option>
-            <option value="draft">Draft</option>
-            <option value="archived">Archived</option>
+            <option value="">{t('common.allStatuses')}</option>
+            <option value="published">{t('common.published')}</option>
+            <option value="draft">{t('common.draft')}</option>
+            <option value="archived">{t('common.archived')}</option>
           </select>
         )}
         onCreate={() => navigate(`/news/new?module_type=${params.module_type}`)}
-        createLabel={`New ${currentTab?.label.toLowerCase().replace(/s$/, '') || 'item'}`}
+        createLabel={`${t('common.new')} ${t(`news.tabs.${params.module_type}`)}`}
       />
 
       <div className="surface-card">

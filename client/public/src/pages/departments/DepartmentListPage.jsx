@@ -1,8 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { departmentsApi, fileUrl } from '../../api/client';
+import { useLanguage } from '../../context/LanguageContext';
 
 export default function DepartmentListPage() {
+  const { t } = useTranslation();
+  const { field } = useLanguage();
   const [items, setItems] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -18,26 +22,26 @@ export default function DepartmentListPage() {
       <div className="auto-container page-title">
         <div className="row">
           <div className="title-box">
-            <h1>विभागहरू</h1>
+            <h1>{t('common.departments')}</h1>
             <ul className="bread-crumb clearfix">
-              <li><Link to="/">गृह पृष्ठ</Link></li>
-              <li>विभागहरू</li>
+              <li><Link to="/">{t('common.home')}</Link></li>
+              <li>{t('common.departments')}</li>
             </ul>
           </div>
         </div>
       </div>
 
       <div className="auto-container" style={{ padding: '30px 0' }}>
-        {isLoading ? <p>लोड हुँदैछ...</p> : (
+        {isLoading ? <p>{t('common.loading')}</p> : (
           <div className="row">
             {items.map((dept) => (
               <div className="col-md-4 col-sm-6" key={dept.id} style={{ marginBottom: 24 }}>
                 <Link to={`/departments/${dept.slug}`} className="department-card" style={{ display: 'block', border: '1px solid #eee', borderRadius: 8, overflow: 'hidden' }}>
                   {dept.image_url && (
-                    <img src={fileUrl(dept.image_url)} alt={dept.name_np} style={{ width: '100%', height: 160, objectFit: 'cover' }} />
+                    <img src={fileUrl(dept.image_url)} alt={field(dept, 'name')} style={{ width: '100%', height: 160, objectFit: 'cover' }} />
                   )}
                   <div style={{ padding: 16 }}>
-                    <h4>{dept.name_np}</h4>
+                    <h4>{field(dept, 'name')}</h4>
                   </div>
                 </Link>
               </div>

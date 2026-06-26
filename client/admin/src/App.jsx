@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { AuthProvider } from './context/AuthContext';
+import { LanguageProvider } from './context/LanguageContext';
 import RequireAuth from './components/RequireAuth';
 import AdminLayout from './layouts/AdminLayout';
 
@@ -27,8 +28,9 @@ import UserList from './pages/users/UserList';
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <AuthProvider>
+    <LanguageProvider>
+      <BrowserRouter>
+        <AuthProvider>
         <Routes>
           <Route path="/login" element={<Login />} />
 
@@ -85,7 +87,8 @@ export default function App() {
           </Route>
         </Routes>
         <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
-      </AuthProvider>
-    </BrowserRouter>
+        </AuthProvider>
+      </BrowserRouter>
+    </LanguageProvider>
   );
 }

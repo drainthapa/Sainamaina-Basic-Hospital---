@@ -1,9 +1,12 @@
 import { useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Home, Search } from 'lucide-react';
 import { NAV_ITEMS } from '../utils/navItems';
 import { useSiteSettings } from '../hooks/useSiteSettings';
 import { useBsDate } from '../hooks/useBsDate';
+import { useLanguage } from '../context/LanguageContext';
+import LanguageToggle from './LanguageToggle';
 
 const FONT_STEPS = [13, 14, 15, 16, 17, 18, 19, 20];
 
@@ -11,6 +14,8 @@ export default function Header() {
   const navigate = useNavigate();
   const settings = useSiteSettings();
   const bsDateToday = useBsDate();
+  const { t } = useTranslation();
+  const { field } = useLanguage();
   const [fontStepIndex, setFontStepIndex] = useState(2); // index into FONT_STEPS, default = base size
   const [isInverted, setIsInverted] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -42,14 +47,15 @@ export default function Header() {
         <div className="noPrint">
           <div className="row justify-content-center top">
             <div className="col-xs-12 col-sm-12 col-md-10 adjustment-buttons">
-              <Link to="/sitemap"><i className="fa fa-sitemap" /> साइट म्याप</Link>
+              <Link to="/sitemap"><i className="fa fa-sitemap" /> {t('header.siteMap')}</Link>
               <a href="#" onClick={(e) => { e.preventDefault(); toggleInvert(); }} title="Invert Color for color blindness">
-                <i className="fa fa-adjust" /> Invert Color
+                <i className="fa fa-adjust" /> {t('header.invertColor')}
               </a>
               <a href="#" onClick={(e) => { e.preventDefault(); applyFontSize(fontStepIndex - 1); }} title="Decrease Font Size">A- </a>
               <a href="#" onClick={(e) => { e.preventDefault(); applyFontSize(2); }} title="Original Font Size">A </a>
               <a href="#" onClick={(e) => { e.preventDefault(); applyFontSize(fontStepIndex + 1); }} title="Increase Font Size">A+ </a>
-              <a href="#" onClick={(e) => { e.preventDefault(); handlePrint(); }} id="print"><i className="fa fa-print" /> Print</a>
+              <a href="#" onClick={(e) => { e.preventDefault(); handlePrint(); }} id="print"><i className="fa fa-print" /> {t('header.print')}</a>
+              <span style={{ display: 'inline-block', marginRight: 10 }}><LanguageToggle /></span>
               <a className="col-md-12 DateTime">{bsDateToday}</a>
             </div>
 
@@ -60,7 +66,7 @@ export default function Header() {
                     <input
                       type="text"
                       className="form-control"
-                      placeholder="खोज्नुहोस"
+                      placeholder={t('header.searchPlaceholder')}
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       autoComplete="off"
@@ -84,9 +90,9 @@ export default function Header() {
                 </div>
                 <div className="col-md-8 col-sm-8 col-xs-9 office-heading">
                   <div className="officeName">
-                    <h4 className="gov">{settings.site_name?.np_municipality || 'सैनामैना नगरपालिका'}</h4>
-                    <h1 className="office-name">{settings.site_name?.np || 'सैनामैना आधारभुत अस्पताल'}</h1>
-                    <h4 className="gov">{settings.contact?.address_np || 'सैनामैना-४,मुर्गिया,रुपन्देही'}</h4>
+                    <h4 className="gov">{field(settings.site_name, 'municipality') || 'सैनामैना नगरपालिका'}</h4>
+                    <h1 className="office-name">{field(settings.site_name, 'name') || 'सैनामैना आधारभुत अस्पताल'}</h1>
+                    <h4 className="gov">{field(settings.contact, 'address') || 'सैनामैना-४,मुर्गिया,रुपन्देही'}</h4>
                   </div>
                 </div>
                 <div className="col-md-2 col-sm-2 hidden-xs">
@@ -118,7 +124,7 @@ export default function Header() {
                 </div>
                 <div className={`navbar-collapse collapse clearfix ${mobileNavOpen ? 'in' : ''}`}>
                   <ul className="navigation clearfix">
-                    {NAV_ITEMS.map((item, i) => {
+                    {NAV_ITEMS.map((item) => {
                       if (item.type === 'home') {
                         return (
                           <li key="home" className="current">
@@ -128,12 +134,12 @@ export default function Header() {
                       }
                       if (item.children) {
                         return (
-                          <li key={item.label} className="dropdown">
-                            <a href="#" onClick={(e) => e.preventDefault()}>{item.label}</a>
+                          <li key={item.labelKey} className="dropdown">
+                            <a href="#" onClick={(e) => e.preventDefault()}>{t(item.labelKey)}</a>
                             <ul>
                               {item.children.map((child) => (
                                 <li key={child.to}>
-                                  <Link to={child.to}>{child.label}</Link>
+                                  <Link to={child.to}>{t(child.labelKey)}</Link>
                                 </li>
                               ))}
                             </ul>
@@ -142,7 +148,7 @@ export default function Header() {
                       }
                       return (
                         <li key={item.to}>
-                          <NavLink to={item.to}>{item.label}</NavLink>
+                          <NavLink to={item.to}>{t(item.labelKey)}</NavLink>
                         </li>
                       );
                     })}

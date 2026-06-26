@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { LanguageProvider } from './context/LanguageContext';
 import PublicLayout from './layouts/PublicLayout';
 import Home from './pages/Home';
 import Contact from './pages/Contact';
@@ -18,8 +19,9 @@ import GalleryAlbumPage from './pages/gallery/GalleryAlbumPage';
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <Routes>
+    <LanguageProvider>
+      <BrowserRouter>
+        <Routes>
         <Route element={<PublicLayout />}>
           <Route index element={<Home />} />
 
@@ -44,7 +46,8 @@ export default function App() {
           <Route path="faqs" element={<Faqs />} />
           <Route path="sitemap" element={<SiteMap />} />
         </Route>
-      </Routes>
-    </BrowserRouter>
+        </Routes>
+      </BrowserRouter>
+    </LanguageProvider>
   );
 }

@@ -1,29 +1,27 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { downloadsApi, fileUrl } from '../../api/client';
 import { adToBs } from '../../hooks/useBsDate';
+import { useLanguage } from '../../context/LanguageContext';
 
-const DOC_TYPE_LABELS = {
-  act: 'ऐन', policy: 'नीति', guideline: 'निर्देशिका', form: 'फारामहरू',
-  action_plan: 'कार्यविधी / कार्ययोजना', budget_program: 'बजेट तथा कार्यक्रम',
-  annual_report: 'बार्षिक प्रतिवेदन', other_report: 'अन्य प्रतिवेदन',
-  publication: 'प्रकाशनहरू', citizen_charter: 'नागरिक वडापत्र',
-  unicode_download: 'युनिकोड डाउनलोड्स', other: 'अन्य डाउनलोड्स',
+const DOC_TYPE_LABEL_KEYS = {
+  act: 'downloads.acts', policy: 'downloads.policies', guideline: 'downloads.guidelines',
+  form: 'nav.forms', action_plan: 'downloads.actionPlan', budget_program: 'downloads.budgetProgram',
+  annual_report: 'downloads.annualReport', other_report: 'downloads.otherReport',
+  publication: 'downloads.publications', citizen_charter: 'downloads.citizenCharter',
+  unicode_download: 'downloads.unicodeDownloads', other: 'downloads.other',
 };
 
 const SIDEBAR_TYPES = [
-  { type: 'form', label: 'फारामहरू' },
-  { type: 'policy', label: 'नीति' },
-  { type: 'action_plan', label: 'कार्यविधी / कार्ययोजना' },
-  { type: 'budget_program', label: 'बजेट तथा कार्यक्रम' },
-  { type: 'annual_report', label: 'बार्षिक प्रतिवेदन' },
-  { type: 'other_report', label: 'अन्य प्रतिवेदन' },
-  { type: 'unicode_download', label: 'युनिकोड डाउनलोड्स' },
-  { type: 'other', label: 'अन्य डाउनलोड्स' },
+  'form', 'policy', 'action_plan', 'budget_program',
+  'annual_report', 'other_report', 'unicode_download', 'other',
 ];
 
 export default function DownloadListPage() {
   const { type } = useParams();
+  const { t } = useTranslation();
+  const { field } = useLanguage();
   const [items, setItems] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -44,16 +42,18 @@ export default function DownloadListPage() {
     window.open(fileUrl(item.file_url), '_blank');
   };
 
+  const titleKey = DOC_TYPE_LABEL_KEYS[type] || 'common.download';
+
   return (
     <>
       <div className="auto-container page-title">
         <div className="row">
           <div className="title-box">
-            <h1>{DOC_TYPE_LABELS[type] || 'डाउनलोड'}</h1>
+            <h1>{t(titleKey)}</h1>
             <ul className="bread-crumb clearfix">
-              <li><Link to="/">गृह पृष्ठ</Link></li>
-              <li>डाउनलोड केन्द्र</li>
-              <li>{DOC_TYPE_LABELS[type]}</li>
+              <li><Link to="/">{t('common.home')}</Link></li>
+              <li>{t('nav.downloadCenter')}</li>
+              <li>{t(titleKey)}</li>
             </ul>
           </div>
         </div>
@@ -65,9 +65,9 @@ export default function DownloadListPage() {
             <div className="col-md-3">
               <div className="notice-group-block">
                 <ul>
-                  {SIDEBAR_TYPES.map((item) => (
-                    <li key={item.type}>
-                      <Link to={`/downloads/${item.type}`}>{item.label}</Link>
+                  {SIDEBAR_TYPES.map((sidebarType) => (
+                    <li key={sidebarType}>
+                      <Link to={`/downloads/${sidebarType}`}>{t(DOC_TYPE_LABEL_KEYS[sidebarType])}</Link>
                     </li>
                   ))}
                 </ul>
@@ -78,22 +78,22 @@ export default function DownloadListPage() {
               <table className="table table-hover table-bordered download-table">
                 <thead>
                   <tr>
-                    <th width="10%" className="text-center">क्र.सं.</th>
-                    <th width="70%">शीर्षक</th>
-                    <th width="10%">मिति</th>
-                    <th width="10%">डाउनलोड</th>
+                    <th width="10%" className="text-center">{t('common.sn')}</th>
+                    <th width="70%">{t('common.title')}</th>
+                    <th width="10%">{t('common.date')}</th>
+                    <th width="10%">{t('common.download')}</th>
                   </tr>
                 </thead>
                 <tbody>
                   {isLoading ? (
-                    <tr><td colSpan={4}>लोड हुँदैछ...</td></tr>
+                    <tr><td colSpan={4}>{t('common.loading')}</td></tr>
                   ) : items.length === 0 ? (
-                    <tr><td colSpan={4}>विवरण उपलब्ध हुन सकेन!</td></tr>
+                    <tr><td colSpan={4}>{t('common.detailsNotAvailable')}</td></tr>
                   ) : (
                     items.map((item, i) => (
                       <tr key={item.id}>
                         <td align="center">{i + 1}</td>
-                        <td>{item.title_np}</td>
+                        <td>{field(item, 'title')}</td>
                         <td>{item.bs_date || adToBs(item.ad_date)}</td>
                         <td align="center">
                           <button type="button" className="btn btn-xs btn-primary" onClick={() => handleDownload(item)}>

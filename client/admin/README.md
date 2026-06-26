@@ -24,8 +24,15 @@ printed by the backend's `npm run seed` command (see `server/README.md`).
 ## What's included
 
 - Login / session handling with silent refresh-token renewal
+- **Full bilingual UI (English / Nepali)** with a language toggle in the
+  sidebar and login screen — every label, button, table header, and message
+  is translated, not just the content fields. Preference persists in
+  `localStorage`.
 - Role-aware sidebar navigation (menu items hide based on your role)
-- **Dashboard** — at-a-glance counts across all modules
+- **Dashboard** — redesigned with real charts: a content-by-type bar chart,
+  a published-vs-draft donut chart, a live recent-activity feed (powered by
+  the audit log), colour-coded clickable stat cards, and one-click quick
+  actions for the most common create flows
 - **Departments** — full CRUD, image upload, publish toggle
 - **Hospital services** — full CRUD, optional department link, emergency flag
 - **Staff & doctors** — full CRUD, photo upload, weekly schedule editor,

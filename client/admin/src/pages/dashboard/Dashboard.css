@@ -2,19 +2,14 @@
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   gap: 14px;
-  margin-bottom: 24px;
+  margin-bottom: 22px;
 }
 
 @media (max-width: 1100px) {
-  .dashboard-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
+  .dashboard-grid { grid-template-columns: repeat(3, 1fr); }
 }
-
 @media (max-width: 700px) {
-  .dashboard-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
+  .dashboard-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
 .dashboard-stat {
@@ -22,14 +17,44 @@
   display: flex;
   align-items: center;
   gap: 12px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  text-align: left;
+  transition: transform 0.15s, box-shadow 0.15s;
+  position: relative;
+  overflow: hidden;
 }
 
+.dashboard-stat:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.dashboard-stat::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 3px;
+  background: var(--stat-accent, var(--color-primary));
+}
+
+.dashboard-stat:nth-child(1) { --stat-accent: #1d6f5c; }
+.dashboard-stat:nth-child(2) { --stat-accent: #2d7dd2; }
+.dashboard-stat:nth-child(3) { --stat-accent: #b9770e; }
+.dashboard-stat:nth-child(4) { --stat-accent: #8e44ad; }
+.dashboard-stat:nth-child(5) { --stat-accent: #c0392b; }
+
 .dashboard-stat-icon {
-  width: 38px;
-  height: 38px;
+  width: 40px;
+  height: 40px;
   border-radius: var(--radius-sm);
   background: var(--color-primary-light);
-  color: var(--color-primary);
+  background: color-mix(in srgb, var(--stat-accent, var(--color-primary)) 14%, white);
+  color: var(--stat-accent, var(--color-primary));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -37,7 +62,7 @@
 }
 
 .dashboard-stat-value {
-  font-size: 22px;
+  font-size: 23px;
   font-weight: 700;
   line-height: 1.1;
 }
@@ -46,6 +71,137 @@
   font-size: 12.5px;
   color: var(--color-text-muted);
   margin-top: 2px;
+}
+
+.dashboard-charts-row {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+@media (max-width: 900px) {
+  .dashboard-charts-row { grid-template-columns: 1fr; }
+}
+
+.dashboard-chart-card {
+  padding: 20px 18px;
+}
+
+.dashboard-chart-card h3 {
+  font-size: 14.5px;
+  margin-bottom: 8px;
+}
+
+.dashboard-chart-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 220px;
+  color: var(--color-text-muted);
+  font-size: 13px;
+}
+
+.dashboard-bottom-row {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+@media (max-width: 900px) {
+  .dashboard-bottom-row { grid-template-columns: 1fr; }
+}
+
+.dashboard-activity-card,
+.dashboard-quick-actions-card {
+  padding: 20px 18px;
+}
+
+.dashboard-activity-card h3,
+.dashboard-quick-actions-card h3 {
+  font-size: 14.5px;
+  margin-bottom: 12px;
+}
+
+.dashboard-activity-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.dashboard-activity-list li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 0;
+  border-bottom: 1px solid #f1f2f4;
+  font-size: 13px;
+}
+
+.dashboard-activity-list li:last-child {
+  border-bottom: none;
+}
+
+.dashboard-activity-icon {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.dashboard-activity-text {
+  flex: 1;
+  color: var(--color-text);
+  text-transform: capitalize;
+}
+
+.dashboard-activity-text strong {
+  text-transform: none;
+}
+
+.dashboard-activity-time {
+  font-size: 11.5px;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+.dashboard-quick-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.dashboard-quick-actions button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: #fafbfc;
+  color: var(--color-text);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.dashboard-quick-actions button:hover {
+  background: var(--color-primary-light);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
 }
 
 .dashboard-welcome {

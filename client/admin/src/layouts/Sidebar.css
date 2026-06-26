@@ -30,6 +30,11 @@
   opacity: 0.75;
 }
 
+.sidebar-lang-row {
+  padding: 10px 18px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
 .sidebar-nav {
   flex: 1;
   padding: 12px 10px;

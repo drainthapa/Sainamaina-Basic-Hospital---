@@ -1,6 +1,8 @@
+import { useTranslation } from 'react-i18next';
 import './Pagination.css';
 
 export default function Pagination({ total, limit, offset, onChange }) {
+  const { t } = useTranslation();
   const totalPages = Math.max(1, Math.ceil(total / limit));
   const currentPage = Math.floor(offset / limit) + 1;
 
@@ -11,13 +13,13 @@ export default function Pagination({ total, limit, offset, onChange }) {
   return (
     <div className="pagination">
       <button type="button" disabled={currentPage === 1} onClick={() => goTo(currentPage - 1)}>
-        Previous
+        {t('common.previous')}
       </button>
       <span className="pagination-status">
-        Page {currentPage} of {totalPages} &middot; {total} total
+        {t('common.page')} {currentPage} {t('common.of')} {totalPages} &middot; {total} {t('common.total')}
       </span>
       <button type="button" disabled={currentPage === totalPages} onClick={() => goTo(currentPage + 1)}>
-        Next
+        {t('common.next')}
       </button>
     </div>
   );

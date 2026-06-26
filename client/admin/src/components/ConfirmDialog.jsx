@@ -1,8 +1,10 @@
 import { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import Button from './Button';
 import './ConfirmDialog.css';
 
 export function useConfirm() {
+  const { t } = useTranslation();
   const [state, setState] = useState(null); // { message, resolve }
 
   const confirm = useCallback(
@@ -28,8 +30,8 @@ export function useConfirm() {
       <div className="confirm-box">
         <p>{state.message}</p>
         <div className="confirm-actions">
-          <Button variant="secondary" onClick={handleCancel}>Cancel</Button>
-          <Button variant="danger" onClick={handleConfirm}>Delete</Button>
+          <Button variant="secondary" onClick={handleCancel}>{t('common.cancel')}</Button>
+          <Button variant="danger" onClick={handleConfirm}>{t('common.delete')}</Button>
         </div>
       </div>
     </div>

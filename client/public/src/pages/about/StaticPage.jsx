@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { contentApi } from '../../api/client';
+import { useLanguage } from '../../context/LanguageContext';
 
 // Slugs match the seeded /content/pages slugs from the backend.
 const SLUG_MAP = {
@@ -8,16 +10,18 @@ const SLUG_MAP = {
 };
 
 const ABOUT_SIDEBAR_LINKS = [
-  { label: 'परिचय', to: '/about/introduction' },
-  { label: 'स्थापना इतिहास', to: '/about/history' },
-  { label: 'उद्देश्य तथा लक्ष्य', to: '/about/objectives' },
-  { label: 'संगठन संरचना', to: '/about/organization' },
-  { label: 'व्यवस्थापन समिति', to: '/staff?type=administrative' },
+  { labelKey: 'nav.introduction', to: '/about/introduction' },
+  { labelKey: 'nav.history', to: '/about/history' },
+  { labelKey: 'nav.objectives', to: '/about/objectives' },
+  { labelKey: 'nav.organization', to: '/about/organization' },
+  { labelKey: 'nav.managementCommittee', to: '/staff?type=administrative' },
 ];
 
 export default function StaticPage() {
   const { pageKey } = useParams();
   const slug = SLUG_MAP[pageKey] || pageKey;
+  const { t } = useTranslation();
+  const { field } = useLanguage();
   const [page, setPage] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -26,19 +30,22 @@ export default function StaticPage() {
     contentApi.getPage(slug).then((res) => setPage(res.data.data)).finally(() => setIsLoading(false));
   }, [slug]);
 
-  if (isLoading) return <div className="auto-container" style={{ padding: '40px 0' }}>लोड हुँदैछ...</div>;
-  if (!page) return <div className="auto-container" style={{ padding: '40px 0' }}>पृष्ठ फेला परेन।</div>;
+  if (isLoading) return <div className="auto-container" style={{ padding: '40px 0' }}>{t('common.loading')}</div>;
+  if (!page) return <div className="auto-container" style={{ padding: '40px 0' }}>{t('common.pageNotFound')}</div>;
+
+  const title = field(page, 'title');
+  const content = field(page, 'content');
 
   return (
     <>
       <div className="auto-container page-title">
         <div className="row">
           <div className="title-box">
-            <h1>{page.title_np}</h1>
+            <h1>{title}</h1>
             <ul className="bread-crumb clearfix">
-              <li><Link to="/">गृह पृष्ठ</Link></li>
-              <li>हाम्रो बारेमा</li>
-              <li>{page.title_np}</li>
+              <li><Link to="/">{t('common.home')}</Link></li>
+              <li>{t('nav.about')}</li>
+              <li>{title}</li>
             </ul>
           </div>
         </div>
@@ -51,7 +58,7 @@ export default function StaticPage() {
               <div className="pages_back">
                 <div className="blog-item">
                   {/* eslint-disable-next-line react/no-danger */}
-                  <div dangerouslySetInnerHTML={{ __html: page.content_np || page.content_en || '<p>सामग्री छिट्टै थपिनेछ।</p>' }} />
+                  <div dangerouslySetInnerHTML={{ __html: content || `<p>${t('common.contentComingSoon')}</p>` }} />
                 </div>
               </div>
             </div>
@@ -61,7 +68,7 @@ export default function StaticPage() {
                 <ul>
                   {ABOUT_SIDEBAR_LINKS.map((link) => (
                     <li key={link.to}>
-                      <Link to={link.to}>{link.label}</Link>
+                      <Link to={link.to}>{t(link.labelKey)}</Link>
                     </li>
                   ))}
                 </ul>

@@ -1,15 +1,19 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { newsApi, fileUrl } from '../../api/client';
 import { adToBs } from '../../hooks/useBsDate';
+import { useLanguage } from '../../context/LanguageContext';
 
-const MODULE_LABELS = {
-  news: 'समाचार', notice: 'सूचना', press_release: 'प्रेस विज्ञप्ति',
-  tender_notice: 'बोलपत्र सूचना', health_article: 'स्वास्थ्य सचेतना', event: 'कार्यक्रम तथा गतिविधि',
+const MODULE_LABEL_KEYS = {
+  news: 'nav.news', notice: 'nav.notice', press_release: 'nav.pressRelease',
+  tender_notice: 'nav.tenderNotice', health_article: 'nav.healthArticle', event: 'nav.events',
 };
 
 export default function NewsDetailPage() {
   const { type, slug } = useParams();
+  const { t } = useTranslation();
+  const { field } = useLanguage();
   const [item, setItem] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
@@ -23,19 +27,19 @@ export default function NewsDetailPage() {
       .finally(() => setIsLoading(false));
   }, [slug]);
 
-  if (isLoading) return <div className="auto-container" style={{ padding: '40px 0' }}>लोड हुँदैछ...</div>;
-  if (notFound || !item) return <div className="auto-container" style={{ padding: '40px 0' }}>सामग्री फेला परेन।</div>;
+  if (isLoading) return <div className="auto-container" style={{ padding: '40px 0' }}>{t('common.loading')}</div>;
+  if (notFound || !item) return <div className="auto-container" style={{ padding: '40px 0' }}>{t('common.contentNotFound')}</div>;
 
   return (
     <>
       <div className="auto-container page-title">
         <div className="row">
           <div className="title-box">
-            <h1>{item.title_np}</h1>
+            <h1>{field(item, 'title')}</h1>
             <ul className="bread-crumb clearfix">
-              <li><Link to="/">गृह पृष्ठ</Link></li>
-              <li><Link to={`/news/${type}`}>{MODULE_LABELS[type]}</Link></li>
-              <li>{item.title_np}</li>
+              <li><Link to="/">{t('common.home')}</Link></li>
+              <li><Link to={`/news/${type}`}>{t(MODULE_LABEL_KEYS[type])}</Link></li>
+              <li>{field(item, 'title')}</li>
             </ul>
           </div>
         </div>
@@ -48,14 +52,14 @@ export default function NewsDetailPage() {
               <div className="tab-date" style={{ marginBottom: 16 }}>
                 {item.bs_date || adToBs(item.ad_date)}
               </div>
-              {item.summary_np && <p><strong>{item.summary_np}</strong></p>}
+              {field(item, 'summary') && <p><strong>{field(item, 'summary')}</strong></p>}
               {/* eslint-disable-next-line react/no-danger */}
-              <div dangerouslySetInnerHTML={{ __html: item.body_np || item.body_en || '' }} />
+              <div dangerouslySetInnerHTML={{ __html: field(item, 'body') || '' }} />
 
               {item.file_url && (
                 <p style={{ marginTop: 20 }}>
                   <a href={fileUrl(item.file_url)} target="_blank" rel="noreferrer" className="btn btn-primary">
-                    <i className="fa fa-download" /> फाइल डाउनलोड गर्नुहोस्
+                    <i className="fa fa-download" /> {t('common.downloadFile')}
                   </a>
                 </p>
               )}

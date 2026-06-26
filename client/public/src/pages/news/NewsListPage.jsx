@@ -1,24 +1,21 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { newsApi } from '../../api/client';
+import { useTranslation } from 'react-i18next';
+import { newsApi, fileUrl } from '../../api/client';
 import { adToBs } from '../../hooks/useBsDate';
-import { fileUrl } from '../../api/client';
+import { useLanguage } from '../../context/LanguageContext';
 
-const MODULE_LABELS = {
-  news: 'समाचार', notice: 'सूचना', press_release: 'प्रेस विज्ञप्ति',
-  tender_notice: 'बोलपत्र सूचना', health_article: 'स्वास्थ्य सचेतना', event: 'कार्यक्रम तथा गतिविधि',
+const MODULE_LABEL_KEYS = {
+  news: 'nav.news', notice: 'nav.notice', press_release: 'nav.pressRelease',
+  tender_notice: 'nav.tenderNotice', health_article: 'nav.healthArticle', event: 'nav.events',
 };
 
-const SIDEBAR_LINKS = [
-  { type: 'notice', label: 'सूचना' },
-  { type: 'press_release', label: 'प्रेस विज्ञप्ति' },
-  { type: 'tender_notice', label: 'बोलपत्र सूचना' },
-  { type: 'news', label: 'समाचार' },
-  { type: 'event', label: 'कार्यक्रम तथा गतिविधि' },
-];
+const SIDEBAR_TYPES = ['notice', 'press_release', 'tender_notice', 'news', 'event'];
 
 export default function NewsListPage() {
   const { type } = useParams();
+  const { t } = useTranslation();
+  const { field } = useLanguage();
   const [items, setItems] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [offset, setOffset] = useState(0);
@@ -43,16 +40,18 @@ export default function NewsListPage() {
     });
   };
 
+  const titleKey = MODULE_LABEL_KEYS[type] || 'nav.news';
+
   return (
     <>
       <div className="auto-container page-title">
         <div className="row">
           <div className="title-box">
-            <h1>{MODULE_LABELS[type] || 'समाचार'}</h1>
+            <h1>{t(titleKey)}</h1>
             <ul className="bread-crumb clearfix">
-              <li><Link to="/">गृह पृष्ठ</Link></li>
-              <li>सूचना पाटी</li>
-              <li>{MODULE_LABELS[type]}</li>
+              <li><Link to="/">{t('common.home')}</Link></li>
+              <li>{t('nav.noticeBoard')}</li>
+              <li>{t(titleKey)}</li>
             </ul>
           </div>
         </div>
@@ -63,9 +62,9 @@ export default function NewsListPage() {
           <div className="row clearfix">
             <div className="col-md-9 col-xs-12">
               {isLoading ? (
-                <p>लोड हुँदैछ...</p>
+                <p>{t('common.loading')}</p>
               ) : items.length === 0 ? (
-                <p>कुनै जानकारी फेला परेन।</p>
+                <p>{t('common.noInformationFound')}</p>
               ) : (
                 items.map((item) => (
                   <div className="row border-dot-bottom" key={item.id}>
@@ -77,11 +76,11 @@ export default function NewsListPage() {
                     </div>
                     <div className="col-lg-10 col-md-10 col-sm-10 col-xs-10 bl-2-light-blue title-block">
                       <h2 className="news-title">
-                        <Link to={`/news/${type}/${item.slug}`}>{item.title_np}</Link>
+                        <Link to={`/news/${type}/${item.slug}`}>{field(item, 'title')}</Link>
                       </h2>
                       {item.file_url && (
                         <a href={fileUrl(item.file_url)} target="_blank" rel="noreferrer" className="news-link">
-                          <i className="fa fa-download" /> डाउलोड
+                          <i className="fa fa-download" /> {t('common.download')}
                         </a>
                       )}
                     </div>
@@ -91,7 +90,7 @@ export default function NewsListPage() {
 
               {items.length < total && (
                 <div style={{ textAlign: 'center', marginTop: 20 }}>
-                  <button type="button" className="btn btn-primary" onClick={loadMore}>थप हेर्नुहोस्</button>
+                  <button type="button" className="btn btn-primary" onClick={loadMore}>{t('common.viewMore')}</button>
                 </div>
               )}
             </div>
@@ -99,9 +98,9 @@ export default function NewsListPage() {
             <div className="col-md-3 col-xs-12">
               <div className="notice-group-block">
                 <ul>
-                  {SIDEBAR_LINKS.map((link) => (
-                    <li key={link.type}>
-                      <Link to={`/news/${link.type}`}>{link.label}</Link>
+                  {SIDEBAR_TYPES.map((sidebarType) => (
+                    <li key={sidebarType}>
+                      <Link to={`/news/${sidebarType}`}>{t(MODULE_LABEL_KEYS[sidebarType])}</Link>
                     </li>
                   ))}
                 </ul>

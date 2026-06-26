@@ -182,7 +182,10 @@ async function seed() {
 
     // Site settings defaults
     const defaultSettings = {
-      site_name: { en: 'Sainamaina Basic Hospital', np: 'सैनामैना आधारभुत अस्पताल' },
+      site_name: {
+        name_en: 'Sainamaina Basic Hospital', name_np: 'सैनामैना आधारभुत अस्पताल',
+        municipality_en: 'Sainamaina Municipality', municipality_np: 'सैनामैना नगरपालिका',
+      },
       contact: { phone: '', emergency_phone: '', email: '', address_en: '', address_np: '' },
       social_links: { facebook: '', twitter: '', youtube: '' },
     };

@@ -1,49 +1,51 @@
 // Mirrors the actual navigation menu embedded in the original site's pages
 // (verified against news.html, not the stale header.html/footer.html template files).
+// labelKey references the i18n dictionary (nav.*) so the menu renders in
+// whichever language is active.
 export const NAV_ITEMS = [
   { type: 'home', to: '/' },
   {
-    label: 'हाम्रो बारेमा',
+    labelKey: 'nav.about',
     children: [
-      { label: 'परिचय', to: '/about/introduction' },
-      { label: 'स्थापना इतिहास', to: '/about/history' },
-      { label: 'उद्देश्य तथा लक्ष्य', to: '/about/objectives' },
-      { label: 'संगठन संरचना', to: '/about/organization' },
-      { label: 'व्यवस्थापन समिति', to: '/staff?type=administrative' },
+      { labelKey: 'nav.introduction', to: '/about/introduction' },
+      { labelKey: 'nav.history', to: '/about/history' },
+      { labelKey: 'nav.objectives', to: '/about/objectives' },
+      { labelKey: 'nav.organization', to: '/about/organization' },
+      { labelKey: 'nav.managementCommittee', to: '/staff?type=administrative' },
     ],
   },
-  { label: 'अस्पताल सेवाहरू', to: '/services' },
-  { label: 'चिकित्सक तथा कर्मचारी', to: '/staff' },
+  { labelKey: 'nav.services', to: '/services' },
+  { labelKey: 'nav.staff', to: '/staff' },
   {
-    label: 'सूचना तथा समाचार',
+    labelKey: 'nav.newsAndNotices',
     children: [
-      { label: 'सूचना', to: '/news/notice' },
-      { label: 'प्रेस विज्ञप्ति', to: '/news/press_release' },
-      { label: 'बोलपत्र सूचना', to: '/news/tender_notice' },
-      { label: 'समाचार', to: '/news/news' },
-      { label: 'कार्यक्रम तथा गतिविधि', to: '/news/event' },
-    ],
-  },
-  {
-    label: 'डाउनलोड केन्द्र',
-    children: [
-      { label: 'फारामहरू', to: '/downloads/form' },
-      { label: 'नीति', to: '/downloads/policy' },
-      { label: 'कार्यविधी / कार्ययोजना', to: '/downloads/action_plan' },
-      { label: 'बजेट तथा कार्यक्रम', to: '/downloads/budget_program' },
-      { label: 'बार्षिक प्रतिवेदन', to: '/downloads/annual_report' },
-      { label: 'अन्य प्रतिवेदन', to: '/downloads/other_report' },
-      { label: 'युनिकोड डाउनलोड्स', to: '/downloads/unicode_download' },
-      { label: 'अन्य डाउनलोड्स', to: '/downloads/other' },
+      { labelKey: 'nav.notice', to: '/news/notice' },
+      { labelKey: 'nav.pressRelease', to: '/news/press_release' },
+      { labelKey: 'nav.tenderNotice', to: '/news/tender_notice' },
+      { labelKey: 'nav.news', to: '/news/news' },
+      { labelKey: 'nav.events', to: '/news/event' },
     ],
   },
   {
-    label: 'मिडिया सेन्टर',
+    labelKey: 'nav.downloadCenter',
     children: [
-      { label: 'तस्विर संग्रह', to: '/gallery/photo' },
-      { label: 'वृत्त चित्र', to: '/gallery/video' },
+      { labelKey: 'nav.forms', to: '/downloads/form' },
+      { labelKey: 'nav.policy', to: '/downloads/policy' },
+      { labelKey: 'nav.actionPlan', to: '/downloads/action_plan' },
+      { labelKey: 'nav.budgetProgram', to: '/downloads/budget_program' },
+      { labelKey: 'nav.annualReport', to: '/downloads/annual_report' },
+      { labelKey: 'nav.otherReport', to: '/downloads/other_report' },
+      { labelKey: 'nav.unicodeDownload', to: '/downloads/unicode_download' },
+      { labelKey: 'nav.otherDownload', to: '/downloads/other' },
     ],
   },
-  { label: 'सम्पर्क', to: '/contact' },
-  { label: 'FAQ', to: '/faqs' },
+  {
+    labelKey: 'nav.mediaCenter',
+    children: [
+      { labelKey: 'nav.photoGallery', to: '/gallery/photo' },
+      { labelKey: 'nav.videoGallery', to: '/gallery/video' },
+    ],
+  },
+  { labelKey: 'nav.contact', to: '/contact' },
+  { labelKey: 'nav.faq', to: '/faqs' },
 ];

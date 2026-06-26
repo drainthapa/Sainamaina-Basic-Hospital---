@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
@@ -8,16 +9,14 @@ import { newsApi, categoriesApi } from '../../api/modules';
 import { Field, TextInput, Select, Checkbox } from '../../components/FormField';
 import Button from '../../components/Button';
 
-const MODULE_LABELS = {
-  news: 'News', notice: 'Notice', press_release: 'Press release',
-  tender_notice: 'Tender notice', health_article: 'Health awareness article', event: 'Event',
-};
+const MODULE_TYPES = ['news', 'notice', 'press_release', 'tender_notice', 'health_article', 'event'];
 
 export default function NewsForm() {
   const { id } = useParams();
   const [searchParams] = useSearchParams();
   const isEdit = id && id !== 'new';
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(isEdit);
   const [isSaving, setIsSaving] = useState(false);
   const [categories, setCategories] = useState([]);
@@ -51,10 +50,10 @@ export default function NewsForm() {
       });
       setIsLoading(false);
     }).catch(() => {
-      toast.error('Failed to load item');
+      toast.error(t('common.loadFailed'));
       navigate('/news');
     });
-  }, [id, isEdit, navigate, reset]);
+  }, [id, isEdit, navigate, reset, t]);
 
   const onSubmit = async (data) => {
     setIsSaving(true);
@@ -66,81 +65,81 @@ export default function NewsForm() {
     try {
       if (isEdit) {
         await newsApi.update(id, payload);
-        toast.success('Updated');
+        toast.success(t('news.updated'));
       } else {
         await newsApi.create(payload);
-        toast.success('Created');
+        toast.success(t('news.created'));
       }
       navigate('/news');
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Save failed');
+      toast.error(err.response?.data?.message || t('common.saveFailed'));
     } finally {
       setIsSaving(false);
     }
   };
 
-  if (isLoading) return <div className="table-state">Loading…</div>;
+  if (isLoading) return <div className="table-state">{t('common.loading')}</div>;
 
   return (
     <div>
       <div className="page-header">
-        <div><h1>{isEdit ? `Edit ${MODULE_LABELS[moduleType]?.toLowerCase()}` : `New ${MODULE_LABELS[moduleType]?.toLowerCase()}`}</h1></div>
+        <div><h1>{isEdit ? `${t('common.edit')} ${t(`news.tabs.${moduleType}`)}` : `${t('common.new')} ${t(`news.tabs.${moduleType}`)}`}</h1></div>
       </div>
 
       <form className="surface-card" style={{ padding: 24 }} onSubmit={handleSubmit(onSubmit)}>
         <div className="form-grid">
-          <Field label="Content type" required>
+          <Field label={t('news.contentType')} required>
             <Select {...register('module_type')} disabled={isEdit}>
-              {Object.entries(MODULE_LABELS).map(([value, label]) => (
-                <option key={value} value={value}>{label}</option>
+              {MODULE_TYPES.map((value) => (
+                <option key={value} value={value}>{t(`news.tabs.${value}`)}</option>
               ))}
             </Select>
           </Field>
-          <Field label="Category">
+          <Field label={t('news.category')}>
             <Select {...register('category_id')}>
-              <option value="">— None —</option>
+              <option value="">{t('common.none')}</option>
               {categories.map((c) => <option key={c.id} value={c.id}>{c.name_en}</option>)}
             </Select>
           </Field>
 
-          <Field label="Title (English)" required error={errors.title_en?.message}>
-            <TextInput {...register('title_en', { required: 'Required' })} />
+          <Field label={t('common.titleEn')} required error={errors.title_en?.message}>
+            <TextInput {...register('title_en', { required: t('common.required') })} />
           </Field>
-          <Field label="Title (Nepali)" required error={errors.title_np?.message}>
-            <TextInput {...register('title_np', { required: 'Required' })} />
+          <Field label={t('common.titleNp')} required error={errors.title_np?.message}>
+            <TextInput {...register('title_np', { required: t('common.required') })} />
           </Field>
 
-          <Field label="BS date" hint="e.g. १४ फागुन २०७७">
+          <Field label={t('news.bsDate')} hint={t('news.bsDateHint')}>
             <TextInput {...register('bs_date')} />
           </Field>
-          <Field label="AD date" required>
+          <Field label={t('news.adDate')} required>
             <TextInput type="date" {...register('ad_date', { required: true })} />
           </Field>
 
-          <Field label="Expiry date" hint="Optional, mainly for notices">
+          <Field label={t('news.expiryDate')} hint={t('news.expiryHint')}>
             <TextInput type="date" {...register('expiry_date')} />
           </Field>
-          <Field label="Status">
+          <Field label={t('common.status')}>
             <Select {...register('status')}>
-              <option value="draft">Draft</option>
-              <option value="published">Published</option>
-              <option value="archived">Archived</option>
+              <option value="draft">{t('common.draft')}</option>
+              <option value="published">{t('common.published')}</option>
+              <option value="archived">{t('common.archived')}</option>
             </Select>
           </Field>
 
-          <Field label="Summary (English)" hint="Optional, short teaser text">
+          <Field label={t('news.summaryEn')} hint={t('news.summaryHint')}>
             <TextInput {...register('summary_en')} />
           </Field>
-          <Field label="Summary (Nepali)" hint="Optional, short teaser text">
+          <Field label={t('news.summaryNp')} hint={t('news.summaryHint')}>
             <TextInput {...register('summary_np')} />
           </Field>
 
           <div className="form-grid-full">
-            <Checkbox label="Featured (show prominently on homepage)" {...register('is_featured')} />
+            <Checkbox label={t('news.featured')} {...register('is_featured')} />
           </div>
         </div>
 
-        <Field label="Body (English)">
+        <Field label={t('news.bodyEn')}>
           <Controller
             name="body_en"
             control={control}
@@ -148,7 +147,7 @@ export default function NewsForm() {
           />
         </Field>
 
-        <Field label="Body (Nepali)">
+        <Field label={t('news.bodyNp')}>
           <Controller
             name="body_np"
             control={control}
@@ -157,8 +156,8 @@ export default function NewsForm() {
         </Field>
 
         <div className="row-actions" style={{ justifyContent: 'flex-start', marginTop: 16 }}>
-          <Button type="submit" isLoading={isSaving}>Save</Button>
-          <Button type="button" variant="secondary" onClick={() => navigate('/news')}>Cancel</Button>
+          <Button type="submit" isLoading={isSaving}>{t('common.save')}</Button>
+          <Button type="button" variant="secondary" onClick={() => navigate('/news')}>{t('common.cancel')}</Button>
         </div>
       </form>
     </div>

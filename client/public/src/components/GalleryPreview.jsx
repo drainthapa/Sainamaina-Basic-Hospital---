@@ -4,8 +4,10 @@ import { Link } from 'react-router-dom';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import { fileUrl } from '../api/client';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function GalleryPreview({ items }) {
+  const { field } = useLanguage();
   if (!items || items.length === 0) return null;
 
   return (
@@ -29,10 +31,10 @@ export default function GalleryPreview({ items }) {
                 <div className="inner-box">
                   <div className="image-box">
                     <figure>
-                      <img style={{ height: 190, width: '100%', objectFit: 'cover' }} src={fileUrl(item.cover_image_url)} alt={item.title_np} />
+                      <img style={{ height: 190, width: '100%', objectFit: 'cover' }} src={fileUrl(item.cover_image_url)} alt={field(item, 'title')} />
                     </figure>
                   </div>
-                  <p className="gallery-caption">{item.title_np}</p>
+                  <p className="gallery-caption">{field(item, 'title')}</p>
                 </div>
               </Link>
             </SwiperSlide>

@@ -70,3 +70,7 @@ export const usersApi = {
   setActive: (id, isActive) => api.put(`/users/${id}/active`, { isActive }),
   remove: (id) => api.delete(`/users/${id}`),
 };
+
+export const auditLogsApi = {
+  list: (params) => api.get('/audit-logs', { params }),
+};

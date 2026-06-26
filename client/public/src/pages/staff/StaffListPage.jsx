@@ -1,15 +1,14 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { staffApi, fileUrl } from '../../api/client';
-
-const STAFF_TYPE_LABELS = {
-  doctor: 'चिकित्सक', nursing: 'नर्सिङ्ग', administrative: 'प्रशासन',
-  technical: 'प्राविधिक', support: 'सहायक',
-};
+import { useLanguage } from '../../context/LanguageContext';
 
 export default function StaffListPage() {
   const [searchParams] = useSearchParams();
   const staffType = searchParams.get('type');
+  const { t } = useTranslation();
+  const { field } = useLanguage();
   const [items, setItems] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -26,10 +25,10 @@ export default function StaffListPage() {
       <div className="auto-container page-title">
         <div className="row">
           <div className="title-box">
-            <h1>चिकित्सक तथा कर्मचारी</h1>
+            <h1>{t('nav.staff')}</h1>
             <ul className="bread-crumb clearfix">
-              <li><Link to="/">गृह पृष्ठ</Link></li>
-              <li>चिकित्सक तथा कर्मचारी</li>
+              <li><Link to="/">{t('common.home')}</Link></li>
+              <li>{t('nav.staff')}</li>
             </ul>
           </div>
         </div>
@@ -40,18 +39,18 @@ export default function StaffListPage() {
           <thead>
             <tr>
               <th width="5%">#</th>
-              <th width="10%">फोटो</th>
-              <th width="20%">नाम</th>
-              <th width="20%">पद</th>
-              <th width="15%">इमेल</th>
-              <th width="15%">सम्पर्क नं.</th>
+              <th width="10%">{t('common.photo')}</th>
+              <th width="20%">{t('common.name')}</th>
+              <th width="20%">{t('common.designation')}</th>
+              <th width="15%">{t('common.email')}</th>
+              <th width="15%">{t('common.phone')}</th>
             </tr>
           </thead>
           <tbody>
             {isLoading ? (
-              <tr><td colSpan={6}>लोड हुँदैछ...</td></tr>
+              <tr><td colSpan={6}>{t('common.loading')}</td></tr>
             ) : items.length === 0 ? (
-              <tr><td colSpan={6}>विवरण उपलब्ध हुन सकेन!</td></tr>
+              <tr><td colSpan={6}>{t('common.detailsNotAvailable')}</td></tr>
             ) : (
               items.map((staff, i) => (
                 <tr key={staff.id}>
@@ -62,7 +61,7 @@ export default function StaffListPage() {
                     )}
                   </td>
                   <td><Link to={`/staff/${staff.id}`}>{staff.full_name}</Link></td>
-                  <td>{staff.designation_np}</td>
+                  <td>{field(staff, 'designation')}</td>
                   <td>{staff.email || '......'}</td>
                   <td>{staff.phone || '......'}</td>
                 </tr>

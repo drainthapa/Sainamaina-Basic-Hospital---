@@ -5,6 +5,13 @@
   justify-content: center;
   background: linear-gradient(160deg, #16241f 0%, #1d6f5c 100%);
   padding: 20px;
+  position: relative;
+}
+
+.login-lang-row {
+  position: absolute;
+  top: 20px;
+  right: 20px;
 }
 
 .login-card {

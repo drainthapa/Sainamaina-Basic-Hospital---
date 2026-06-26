@@ -1,17 +1,20 @@
+import { useTranslation } from 'react-i18next';
 import './DataTable.css';
 
 /**
  * @param {{key: string, label: string, render?: (row: any) => React.ReactNode, width?: string}[]} columns
  */
-export default function DataTable({ columns, rows, isLoading, error, emptyMessage = 'No records found.' }) {
+export default function DataTable({ columns, rows, isLoading, error, emptyMessage }) {
+  const { t } = useTranslation();
+
   if (isLoading) {
-    return <div className="table-state">Loading…</div>;
+    return <div className="table-state">{t('common.loading')}</div>;
   }
   if (error) {
     return <div className="table-state table-state-error">{error}</div>;
   }
   if (!rows || rows.length === 0) {
-    return <div className="table-state">{emptyMessage}</div>;
+    return <div className="table-state">{emptyMessage || t('common.noRecordsFound')}</div>;
   }
 
   return (

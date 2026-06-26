@@ -1,9 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { departmentsApi, staffApi, fileUrl } from '../../api/client';
+import { useLanguage } from '../../context/LanguageContext';
 
 export default function DepartmentDetailPage() {
   const { slug } = useParams();
+  const { t } = useTranslation();
+  const { field } = useLanguage();
   const [dept, setDept] = useState(null);
   const [staff, setStaff] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -17,31 +21,31 @@ export default function DepartmentDetailPage() {
       .finally(() => setIsLoading(false));
   }, [slug]);
 
-  if (isLoading) return <div className="auto-container" style={{ padding: '40px 0' }}>लोड हुँदैछ...</div>;
-  if (!dept) return <div className="auto-container" style={{ padding: '40px 0' }}>फेला परेन।</div>;
+  if (isLoading) return <div className="auto-container" style={{ padding: '40px 0' }}>{t('common.loading')}</div>;
+  if (!dept) return <div className="auto-container" style={{ padding: '40px 0' }}>{t('common.notFound')}</div>;
 
   return (
     <>
       <div className="auto-container page-title">
         <div className="row">
           <div className="title-box">
-            <h1>{dept.name_np}</h1>
+            <h1>{field(dept, 'name')}</h1>
             <ul className="bread-crumb clearfix">
-              <li><Link to="/">गृह पृष्ठ</Link></li>
-              <li><Link to="/departments">विभागहरू</Link></li>
-              <li>{dept.name_np}</li>
+              <li><Link to="/">{t('common.home')}</Link></li>
+              <li><Link to="/departments">{t('common.departments')}</Link></li>
+              <li>{field(dept, 'name')}</li>
             </ul>
           </div>
         </div>
       </div>
 
       <div className="auto-container" style={{ padding: '30px 0' }}>
-        {dept.image_url && <img src={fileUrl(dept.image_url)} alt={dept.name_np} style={{ width: '100%', maxHeight: 320, objectFit: 'cover', marginBottom: 20, borderRadius: 8 }} />}
-        <p>{dept.description_np}</p>
+        {dept.image_url && <img src={fileUrl(dept.image_url)} alt={field(dept, 'name')} style={{ width: '100%', maxHeight: 320, objectFit: 'cover', marginBottom: 20, borderRadius: 8 }} />}
+        <p>{field(dept, 'description')}</p>
 
         {staff.length > 0 && (
           <>
-            <h3 style={{ marginTop: 24 }}>चिकित्सक तथा कर्मचारी</h3>
+            <h3 style={{ marginTop: 24 }}>{t('nav.staff')}</h3>
             <div className="row">
               {staff.map((member) => (
                 <div className="col-md-3 col-sm-6" key={member.id} style={{ marginBottom: 20, textAlign: 'center' }}>
@@ -50,7 +54,7 @@ export default function DepartmentDetailPage() {
                       <img src={fileUrl(member.photo_url)} alt={member.full_name} style={{ width: 90, height: 90, borderRadius: '50%', objectFit: 'cover' }} />
                     )}
                     <div style={{ marginTop: 8, fontWeight: 600 }}>{member.full_name}</div>
-                    <div style={{ fontSize: 13, color: '#777' }}>{member.designation_np}</div>
+                    <div style={{ fontSize: 13, color: '#777' }}>{field(member, 'designation')}</div>
                   </Link>
                 </div>
               ))}
