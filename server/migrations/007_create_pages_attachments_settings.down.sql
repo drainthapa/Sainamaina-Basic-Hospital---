@@ -1,0 +1,4 @@
+DROP TABLE IF EXISTS site_settings;
+DROP TABLE IF EXISTS faqs;
+DROP TABLE IF EXISTS attachments;
+DROP TABLE IF EXISTS pages;

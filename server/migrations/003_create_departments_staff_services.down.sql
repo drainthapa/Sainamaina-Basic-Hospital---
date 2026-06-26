@@ -1,0 +1,4 @@
+DROP TABLE IF EXISTS staff_schedules;
+DROP TABLE IF EXISTS staff;
+DROP TABLE IF EXISTS services;
+DROP TABLE IF EXISTS departments;

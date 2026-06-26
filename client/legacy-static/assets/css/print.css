@@ -1,0 +1,18 @@
+@charset "utf-8";
+/* CSS Document */
+
+@media print {
+  
+ .sidebar, .printbtn, .footer, .footer-small, .breadcrumb {
+	display:none !important; 
+ }
+ #content {
+	width:100% !important; 
+ }
+ .printbtn {
+	display:none !important;
+	margin:0 !important; 
+ }
+ 
+  
+}

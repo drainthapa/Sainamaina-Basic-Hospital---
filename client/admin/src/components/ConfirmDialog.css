@@ -1,0 +1,28 @@
+.confirm-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 20, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.confirm-box {
+  background: #fff;
+  border-radius: var(--radius-md);
+  padding: 22px 24px;
+  max-width: 380px;
+  box-shadow: var(--shadow-md);
+}
+
+.confirm-box p {
+  margin: 0 0 18px;
+  font-size: 14px;
+}
+
+.confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}

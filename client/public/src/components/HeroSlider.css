@@ -1,0 +1,30 @@
+.main-slider {
+  position: relative;
+}
+
+.hero-swiper {
+  width: 100%;
+}
+
+.fleximg img {
+  width: 100%;
+  display: block;
+}
+
+.flex-caption {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  background: rgba(0, 0, 0, 0.5);
+  width: 100%;
+  margin: 0;
+  padding: 5px 10px;
+  color: #fff !important;
+  font-size: 16px;
+  font-weight: normal;
+  z-index: 2;
+}
+
+.flex-caption h3 a {
+  color: #fff;
+}
