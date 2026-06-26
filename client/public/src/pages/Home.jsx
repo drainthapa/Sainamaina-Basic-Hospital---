@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import Marquee from '../components/Marquee';
 import HeroSlider from '../components/HeroSlider';
 import VipMembers from '../components/VipMembers';
+import HomeNewsTabs from '../components/HomeNewsTabs';
 import DocumentTabs from '../components/DocumentTabs';
 import GalleryPreview from '../components/GalleryPreview';
 import { newsApi, staffApi, downloadsApi, galleryApi } from '../api/client';
@@ -17,30 +18,45 @@ const E_GOV_LINKS = [
 ];
 
 const DOC_TABS_TYPES = ['policy', 'act', 'guideline', 'action_plan'];
+const NEWS_TABS_TYPES = ['notice', 'health_article', 'news', 'event'];
 
 export default function Home() {
   const [notices, setNotices] = useState([]);
   const [vipMembers, setVipMembers] = useState([]);
   const [docsByType, setDocsByType] = useState({});
+  const [newsByType, setNewsByType] = useState({});
   const [galleryItems, setGalleryItems] = useState([]);
 
   useEffect(() => {
-    newsApi.list({ module_type: 'notice', limit: 5 }).then((res) => setNotices(res.data.data)).catch(() => {});
-    staffApi.list({ staff_type: 'administrative', limit: 3 }).then((res) => setVipMembers(res.data.data)).catch(() => {});
-    galleryApi.listAlbums({ album_type: 'photo', limit: 8 }).then((res) => setGalleryItems(res.data.data)).catch(() => {});
+    newsApi.list({ module_type: 'notice', limit: 5 }).then((res) => setNotices(res.data.data)).catch(() => { });
+    staffApi.list({ staff_type: 'administrative', limit: 3 }).then((res) => setVipMembers(res.data.data)).catch(() => { });
+    galleryApi.listAlbums({ album_type: 'photo', limit: 8 }).then((res) => setGalleryItems(res.data.data)).catch(() => { });
+
     Promise.all(
       DOC_TABS_TYPES.map((type) => downloadsApi.list({ doc_type: type, limit: 8 }))
     ).then((results) => {
       const map = {};
       DOC_TABS_TYPES.forEach((type, i) => { map[type] = results[i].data.data; });
       setDocsByType(map);
-    }).catch(() => {});
+    }).catch(() => { });
+
+    Promise.all(
+      NEWS_TABS_TYPES.map((type) => newsApi.list({ module_type: type, limit: 5 }))
+    ).then((results) => {
+      const map = {};
+      NEWS_TABS_TYPES.forEach((type, i) => { map[type] = results[i].data.data; });
+      setNewsByType(map);
+    }).catch(() => { });
   }, []);
 
   return (
-    <>
-      <div className="auto-container">
+    <div className="pattern">
+      <div className="container">
         <div className="row">
+          <div className="col-md-3 col-sm-12">
+            <HomeNewsTabs itemsByType={newsByType} />
+          </div>
+
           <div className="col-md-6 col-sm-12">
             <section className="main-slider">
               <div className="row">
@@ -55,8 +71,29 @@ export default function Home() {
           <div className="col-md-3 col-sm-12">
             <VipMembers members={vipMembers} />
           </div>
+        </div>
 
-          <div className="col-md-3 col-sm-12">
+        <div className="row">
+          <div className="col-md-7 col-sm-12">
+            <h2 className="intro_title">
+              <span><i className="fa fa-clone" /> परिचय</span>
+            </h2>
+            <div className="intro_content">
+              <p style={{ textAlign: 'justify' }}>
+                सैनामैना आधारभूत अस्पताल (सैनामैना नगर अस्पताल) लुम्बिनी प्रदेश अन्तर्गत रुपन्देही जिल्लाको
+                सैनामैना नगरपालिका वडा नं. ४, मुर्गियामा अवस्थित एक स्थानीय सरकारी स्वास्थ्य संस्था हो। प्रत्येक
+                नागरिकलाई पायक पर्ने स्थानमा गुणस्तरीय स्वास्थ्य सेवा पुर्‍याउने उद्देश्यका साथ नेपाल सरकारको
+                "एक स्थानीय तह, एक आधारभूत अस्पताल" नीति अन्तर्गत यस अस्पतालको स्थापना गरिएको हो।
+              </p>
+              <p style={{ textAlign: 'justify' }}>
+                <Link className="btn btn-xs btn-primary pull-right" to="/about/introduction">
+                  <i className="fa fa-arrow-right" /> थप पढ्नुहोस्
+                </Link>
+              </p>
+            </div>
+          </div>
+
+          <div className="col-md-5 col-sm-12">
             <div className="e-service-content">
               <h2 className="service-title">विद्युतीय शासन सेवा</h2>
               <div className="row">
@@ -75,31 +112,10 @@ export default function Home() {
             </div>
           </div>
         </div>
-
-        <div className="row">
-          <div className="col-md-12 col-sm-12">
-            <h2 className="intro_title">
-              <span><i className="fa fa-clone" /> परिचय</span>
-            </h2>
-            <div className="intro_content">
-              <p style={{ textAlign: 'justify' }}>
-                सैनामैना आधारभूत अस्पताल (सैनामैना नगर अस्पताल) लुम्बिनी प्रदेश अन्तर्गत रुपन्देही जिल्लाको
-                सैनामैना नगरपालिका वडा नं. ४, मुर्गियामा अवस्थित एक स्थानीय सरकारी स्वास्थ्य संस्था हो। प्रत्येक
-                नागरिकलाई पायक पर्ने स्थानमा गुणस्तरीय स्वास्थ्य सेवा पुर्‍याउने उद्देश्यका साथ नेपाल सरकारको
-                "एक स्थानीय तह, एक आधारभूत अस्पताल" नीति अन्तर्गत यस अस्पतालको स्थापना गरिएको हो।
-              </p>
-              <p style={{ textAlign: 'justify' }}>
-                <Link className="btn btn-xs btn-primary pull-right" to="/about/introduction">
-                  <i className="fa fa-arrow-right" /> थप पढ्नुहोस्
-                </Link>
-              </p>
-            </div>
-          </div>
-        </div>
       </div>
 
       <DocumentTabs documentsByType={docsByType} />
       <GalleryPreview items={galleryItems} />
-    </>
+    </div>
   );
 }

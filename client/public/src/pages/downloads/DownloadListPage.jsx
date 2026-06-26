@@ -11,6 +11,17 @@ const DOC_TYPE_LABELS = {
   unicode_download: 'युनिकोड डाउनलोड्स', other: 'अन्य डाउनलोड्स',
 };
 
+const SIDEBAR_TYPES = [
+  { type: 'form', label: 'फारामहरू' },
+  { type: 'policy', label: 'नीति' },
+  { type: 'action_plan', label: 'कार्यविधी / कार्ययोजना' },
+  { type: 'budget_program', label: 'बजेट तथा कार्यक्रम' },
+  { type: 'annual_report', label: 'बार्षिक प्रतिवेदन' },
+  { type: 'other_report', label: 'अन्य प्रतिवेदन' },
+  { type: 'unicode_download', label: 'युनिकोड डाउनलोड्स' },
+  { type: 'other', label: 'अन्य डाउनलोड्स' },
+];
+
 export default function DownloadListPage() {
   const { type } = useParams();
   const [items, setItems] = useState([]);
@@ -49,36 +60,54 @@ export default function DownloadListPage() {
       </div>
 
       <div className="auto-container" style={{ padding: '30px 0' }}>
-        <table className="table table-hover table-bordered download-table">
-          <thead>
-            <tr>
-              <th width="10%" className="text-center">क्र.सं.</th>
-              <th width="70%">शीर्षक</th>
-              <th width="10%">मिति</th>
-              <th width="10%">डाउनलोड</th>
-            </tr>
-          </thead>
-          <tbody>
-            {isLoading ? (
-              <tr><td colSpan={4}>लोड हुँदैछ...</td></tr>
-            ) : items.length === 0 ? (
-              <tr><td colSpan={4}>विवरण उपलब्ध हुन सकेन!</td></tr>
-            ) : (
-              items.map((item, i) => (
-                <tr key={item.id}>
-                  <td align="center">{i + 1}</td>
-                  <td>{item.title_np}</td>
-                  <td>{item.bs_date || adToBs(item.ad_date)}</td>
-                  <td align="center">
-                    <button type="button" className="btn btn-xs btn-primary" onClick={() => handleDownload(item)}>
-                      <i className="fa fa-download" />
-                    </button>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+        <section className="contact-info-section">
+          <div className="row clearfix">
+            <div className="col-md-3">
+              <div className="notice-group-block">
+                <ul>
+                  {SIDEBAR_TYPES.map((item) => (
+                    <li key={item.type}>
+                      <Link to={`/downloads/${item.type}`}>{item.label}</Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+            <div className="col-md-8">
+              <table className="table table-hover table-bordered download-table">
+                <thead>
+                  <tr>
+                    <th width="10%" className="text-center">क्र.सं.</th>
+                    <th width="70%">शीर्षक</th>
+                    <th width="10%">मिति</th>
+                    <th width="10%">डाउनलोड</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {isLoading ? (
+                    <tr><td colSpan={4}>लोड हुँदैछ...</td></tr>
+                  ) : items.length === 0 ? (
+                    <tr><td colSpan={4}>विवरण उपलब्ध हुन सकेन!</td></tr>
+                  ) : (
+                    items.map((item, i) => (
+                      <tr key={item.id}>
+                        <td align="center">{i + 1}</td>
+                        <td>{item.title_np}</td>
+                        <td>{item.bs_date || adToBs(item.ad_date)}</td>
+                        <td align="center">
+                          <button type="button" className="btn btn-xs btn-primary" onClick={() => handleDownload(item)}>
+                            <i className="fa fa-download" />
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
       </div>
     </>
   );

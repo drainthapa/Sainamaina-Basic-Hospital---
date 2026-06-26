@@ -14,7 +14,7 @@ export default function HeroSlider({ slides }) {
   const items = slides && slides.length > 0 ? slides : FALLBACK_SLIDES;
 
   return (
-    <section className="main-slider">
+    <div id="promo-slider" className="slider flexslider">
       <Swiper
         modules={[Autoplay, EffectFade]}
         effect="fade"
@@ -38,6 +38,6 @@ export default function HeroSlider({ slides }) {
           </SwiperSlide>
         ))}
       </Swiper>
-    </section>
+    </div>
   );
 }
