@@ -3,12 +3,21 @@
   <head>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
 
-    <meta name="keywords" content="sainamaina hospital, sainamaina primary hospital, Sainamaina Municipality, Buddhanagar, Rupandehi, सैनामैना आधारभुत अस्पताल" />
-    <meta name="description" content="सैनामैना आधारभुत अस्पताल | सैनामैना नगरपालिका" />
+    <meta
+      name="keywords"
+      content="sainamaina hospital, sainamaina primary hospital, Sainamaina Municipality, Buddhanagar, Rupandehi, सैनामैना आधारभुत अस्पताल" />
+    <meta
+      name="description"
+      content="सैनामैना आधारभुत अस्पताल | सैनामैना नगरपालिका" />
 
-    <link rel="shortcut icon" href="/assets/images/nepal-logo.png" type="image/x-icon" />
+    <link
+      rel="shortcut icon"
+      href="/assets/images/nepal-logo.png"
+      type="image/x-icon" />
     <link rel="icon" href="/assets/images/nepal-logo.png" type="image/x-icon" />
     <title>सैनामैना आधारभुत अस्पताल | सैनामैना नगरपालिका</title>
 
@@ -23,5 +32,27 @@
   <body class="pattern">
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
+    <script>
+      window.ACCESSIBILITY_WIDGET_CONFIG = {
+        // Disable specific features
+        enableVoiceControl: false,
+        enableScreenReader: true,
+
+        // Custom styling
+        widgetWidth: "400px",
+        colors: {
+          primary: "#0066cc",
+          secondary: "#ffffff",
+        },
+
+        // Position on left side
+        widgetPosition: {
+          side: "right",
+          left: "20px",
+          bottom: "20px",
+        },
+      };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/accessibility-widgets@latest/widget.js"></script>
   </body>
 </html>

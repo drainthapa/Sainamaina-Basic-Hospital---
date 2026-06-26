@@ -7,6 +7,7 @@ import { useSiteSettings } from '../hooks/useSiteSettings';
 import { useBsDate } from '../hooks/useBsDate';
 import { useLanguage } from '../context/LanguageContext';
 import LanguageToggle from './LanguageToggle';
+import './Header.css';
 
 const FONT_STEPS = [13, 14, 15, 16, 17, 18, 19, 20];
 
@@ -45,39 +46,81 @@ export default function Header() {
     <header className="main-header">
       <div className="auto-container header-upper">
         <div className="noPrint">
-          <div className="row justify-content-center top">
-            <div className="col-xs-12 col-sm-12 col-md-10 adjustment-buttons">
-              <Link to="/sitemap"><i className="fa fa-sitemap" /> {t('header.siteMap')}</Link>
-              <a href="#" onClick={(e) => { e.preventDefault(); toggleInvert(); }} title="Invert Color for color blindness">
-                <i className="fa fa-adjust" /> {t('header.invertColor')}
-              </a>
-              <a href="#" onClick={(e) => { e.preventDefault(); applyFontSize(fontStepIndex - 1); }} title="Decrease Font Size">A- </a>
-              <a href="#" onClick={(e) => { e.preventDefault(); applyFontSize(2); }} title="Original Font Size">A </a>
-              <a href="#" onClick={(e) => { e.preventDefault(); applyFontSize(fontStepIndex + 1); }} title="Increase Font Size">A+ </a>
-              <a href="#" onClick={(e) => { e.preventDefault(); handlePrint(); }} id="print"><i className="fa fa-print" /> {t('header.print')}</a>
-              <span style={{ display: 'inline-block', marginRight: 10 }}><LanguageToggle /></span>
-              <a className="col-md-12 DateTime">{bsDateToday}</a>
+          <div className="top-bar">
+
+            <div className="top-bar-left">
+
+              <Link to="/sitemap" className="top-item">
+                <i className="fa fa-sitemap" />
+                <span>{t('header.siteMap')}</span>
+              </Link>
+
+              <button
+                className="top-item"
+                onClick={toggleInvert}
+                title="Invert Color"
+              >
+                <i className="fa fa-adjust" />
+                <span>{t('header.invertColor')}</span>
+              </button>
+
+              <button
+                className="font-btn"
+                onClick={() => applyFontSize(fontStepIndex - 1)}
+              >
+                A-
+              </button>
+
+              <button
+                className="font-btn"
+                onClick={() => applyFontSize(2)}
+              >
+                A
+              </button>
+
+              <button
+                className="font-btn"
+                onClick={() => applyFontSize(fontStepIndex + 1)}
+              >
+                A+
+              </button>
+
+              <button
+                className="top-item"
+                onClick={handlePrint}
+              >
+                <i className="fa fa-print" />
+                <span>{t('header.print')}</span>
+              </button>
+
+              <div className="date-time">
+                <i className="fa fa-calendar" />
+                {bsDateToday}
+              </div>
+
             </div>
 
-            <div className="col-xs-12 col-sm-12 col-md-2">
-              <div className="pull-right">
-                <form onSubmit={handleSearchSubmit}>
-                  <div className="input-group">
-                    <input
-                      type="text"
-                      className="form-control"
-                      placeholder={t('header.searchPlaceholder')}
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      autoComplete="off"
-                    />
-                    <span className="input-group-btn">
-                      <button className="btn btn-primary" type="submit"><Search size={14} /></button>
-                    </span>
-                  </div>
-                </form>
-              </div>
+            <div className="top-bar-right">
+
+              <LanguageToggle />
+
+              <form onSubmit={handleSearchSubmit} className="search-form">
+
+                <input
+                  type="text"
+                  placeholder={t("header.searchPlaceholder")}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+
+                <button type="submit">
+                  <Search size={16} />
+                </button>
+
+              </form>
+
             </div>
+
           </div>
 
           <div className="logo-box row">
