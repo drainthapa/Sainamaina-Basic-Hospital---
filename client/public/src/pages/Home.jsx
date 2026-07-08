@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import './Home.css';
 import { useTranslation } from 'react-i18next';
 import Marquee from '../components/Marquee';
 import HeroSlider from '../components/HeroSlider';
@@ -33,10 +34,10 @@ export default function Home() {
   const [introPage, setIntroPage] = useState(null);
 
   useEffect(() => {
-    newsApi.list({ module_type: 'notice', limit: 5 }).then((res) => setNotices(res.data.data)).catch(() => {});
-    staffApi.list({ staff_type: 'administrative', limit: 3 }).then((res) => setVipMembers(res.data.data)).catch(() => {});
-    galleryApi.listAlbums({ album_type: 'photo', limit: 8 }).then((res) => setGalleryItems(res.data.data)).catch(() => {});
-    contentApi.getPage('introduction').then((res) => setIntroPage(res.data.data)).catch(() => {});
+    newsApi.list({ module_type: 'notice', limit: 5 }).then((res) => setNotices(res.data.data)).catch(() => { });
+    staffApi.list({ staff_type: 'administrative', limit: 3 }).then((res) => setVipMembers(res.data.data)).catch(() => { });
+    galleryApi.listAlbums({ album_type: 'photo', limit: 8 }).then((res) => setGalleryItems(res.data.data)).catch(() => { });
+    contentApi.getPage('introduction').then((res) => setIntroPage(res.data.data)).catch(() => { });
 
     Promise.all(
       DOC_TABS_TYPES.map((type) => downloadsApi.list({ doc_type: type, limit: 8 }))
@@ -44,7 +45,7 @@ export default function Home() {
       const map = {};
       DOC_TABS_TYPES.forEach((type, i) => { map[type] = results[i].data.data; });
       setDocsByType(map);
-    }).catch(() => {});
+    }).catch(() => { });
 
     Promise.all(
       NEWS_TABS_TYPES.map((type) => newsApi.list({ module_type: type, limit: 5 }))
@@ -52,7 +53,7 @@ export default function Home() {
       const map = {};
       NEWS_TABS_TYPES.forEach((type, i) => { map[type] = results[i].data.data; });
       setNewsByType(map);
-    }).catch(() => {});
+    }).catch(() => { });
   }, []);
 
   const introFallback = 'सैनामैना आधारभूत अस्पताल (सैनामैना नगर अस्पताल) लुम्बिनी प्रदेश अन्तर्गत रुपन्देही जिल्लाको सैनामैना नगरपालिका वडा नं. ४, मुर्गियामा अवस्थित एक स्थानीय सरकारी स्वास्थ्य संस्था हो।';

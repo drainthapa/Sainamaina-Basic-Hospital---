@@ -1,0 +1,60 @@
+/* ── Introduction content overflow guards ──────────────────────────────────
+   The CMS rich-text editor can inject arbitrary HTML (images, tables, wide
+   paragraphs). These rules ensure none of it breaks out of the col-md-7
+   boundary or overlaps the e-service column beside it.
+   ─────────────────────────────────────────────────────────────────────── */
+
+.intro_content {
+    overflow: hidden;
+    /* last-resort containment */
+    word-break: break-word;
+    /* stops very long unbroken strings overflowing */
+}
+
+/* Force every media element inside the injected HTML to stay within its column */
+.intro_content img,
+.intro_content video,
+.intro_content iframe,
+.intro_content embed,
+.intro_content object {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Tables injected by the rich-text editor can be wider than the column.
+   Make them scroll horizontally rather than push out of the column. */
+.intro_content table {
+    max-width: 100%;
+    table-layout: fixed;
+    word-wrap: break-word;
+}
+
+/* Wrap the table in a scrollable container if it is still too wide */
+.intro_content .ql-editor table,
+.intro_content>div>table {
+    display: block;
+    overflow-x: auto;
+}
+
+/* ── E-service content column alignment ────────────────────────────────────
+   .e-service-content has display:flex + align-items:center, which vertically
+   centres the e-gov links inside the full height of the Bootstrap equal-height
+   row. When the intro column is tall, the e-gov links float to the middle of
+   a very large gray box instead of sitting at the top where they belong.
+   ─────────────────────────────────────────────────────────────────────── */
+
+.e-service-content {
+    align-items: flex-start !important;
+    /* anchor content to top, not centre */
+    align-self: flex-start;
+    /* stop the column itself stretching  */
+    height: auto !important;
+}
+
+/* On mobile the two columns stack, so restore normal block flow */
+@media (max-width: 767px) {
+    .e-service-content {
+        align-items: center !important;
+        /* keep centred on narrow screens */
+    }
+}
