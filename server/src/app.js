@@ -55,35 +55,51 @@ app.use(
 );
 
 // Rate limiting — protect against brute force and credential stuffing in production.
-// Skip entirely for loopback requests in development (both client apps run on localhost
-// and make automated background calls like /refresh, which would trivially exhaust a
-// shared per-IP limit during normal dev usage).
+// In development both client apps run on localhost and make automated background
+// calls (silent /refresh on every page load, parallel dashboard fetches, etc.)
+// that would trivially exhaust any shared per-IP limit. We skip the limiter
+// entirely for loopback IPs in development.
 const isDev = process.env.NODE_ENV !== "production";
 
+function isLoopback(req) {
+  const ip = req.ip || req.socket?.remoteAddress || "";
+  // IPv4 loopback, IPv6 loopback, IPv4-mapped-in-IPv6 loopback
+  if (ip === "127.0.0.1" || ip === "::1" || ip.startsWith("::ffff:127."))
+    return true;
+  // Also check X-Forwarded-For in case a local reverse proxy is in front
+  const forwarded = req.headers["x-forwarded-for"];
+  if (forwarded) {
+    const first = forwarded.split(",")[0].trim();
+    if (
+      first === "127.0.0.1" ||
+      first === "::1" ||
+      first.startsWith("::ffff:127.")
+    )
+      return true;
+  }
+  return false;
+}
+
+// Global limiter: in dev, skip entirely for loopback; in prod use env or 300.
+// IMPORTANT: don't set RATE_LIMIT_MAX in your dev .env — it overrides the
+// generous dev default. Only set it in production.
 const globalLimiter = rateLimit({
   windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS, 10) || 15 * 60 * 1000,
-  max: parseInt(process.env.RATE_LIMIT_MAX, 10) || (isDev ? 2000 : 300),
+  max: isDev ? 10000 : parseInt(process.env.RATE_LIMIT_MAX, 10) || 300,
   standardHeaders: true,
   legacyHeaders: false,
-  skip: isDev
-    ? (req) => {
-        const ip = req.ip || "";
-        return (
-          ip === "127.0.0.1" || ip === "::1" || ip.startsWith("::ffff:127.")
-        );
-      }
-    : undefined,
+  skip: isDev ? isLoopback : undefined,
 });
 
-// The /refresh endpoint is called automatically by the client on every page load to
-// silently renew the session. Even in production it doesn't benefit from strict rate
-// limiting since it requires a valid signed httpOnly cookie — so give it a very
-// generous limit separate from the global one.
+// /refresh is called automatically on every page load to silently renew the
+// session — it doesn't benefit from strict rate limiting even in production
+// since it requires a valid signed httpOnly cookie.
 const refreshLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: isDev ? 10000 : 1000,
+  max: isDev ? 100000 : 1000,
   standardHeaders: true,
   legacyHeaders: false,
+  skip: isDev ? isLoopback : undefined,
 });
 
 app.use("/api/auth/refresh", refreshLimiter);
