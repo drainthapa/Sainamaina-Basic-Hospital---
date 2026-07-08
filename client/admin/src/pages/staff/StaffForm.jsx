@@ -8,8 +8,35 @@ import { staffApi, departmentsApi } from '../../api/modules';
 import { Field, TextInput, TextArea, Select, Checkbox } from '../../components/FormField';
 import FileUpload from '../../components/FileUpload';
 import Button from '../../components/Button';
+import './StaffForm.css';
 
 const STAFF_TYPES = ['doctor', 'nursing', 'administrative', 'technical', 'support'];
+const FILE_BASE = import.meta.env.VITE_FILE_BASE_URL || 'http://localhost:5000';
+
+/** Derive up to 2 uppercase initials from a full name.
+ *  "ABC Thapa"   → "AT"
+ *  "Ram"         → "R"
+ *  "Dr. Sita Rai"→ "SR"  (skips honorific prefixes)
+ */
+function getInitials(name = '') {
+  const HONORIFICS = /^(dr|mr|mrs|ms|prof|er|eng|adv)\.?$/i;
+  const parts = name.trim().split(/\s+/).filter((w) => w && !HONORIFICS.test(w));
+  if (parts.length === 0) return '?';
+  if (parts.length === 1) return parts[0][0].toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
+
+/** Pick a deterministic background colour from the name so the avatar always
+ *  looks the same for the same person and stays visually distinct across rows. */
+const AVATAR_COLORS = [
+  '#0956CE', '#0F6E56', '#7C3AED', '#B45309',
+  '#0E7490', '#BE185D', '#15803D', '#9A3412',
+];
+function avatarColor(name = '') {
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) hash = (hash * 31 + name.charCodeAt(i)) >>> 0;
+  return AVATAR_COLORS[hash % AVATAR_COLORS.length];
+}
 
 export default function StaffForm() {
   const { id } = useParams();
@@ -24,14 +51,21 @@ export default function StaffForm() {
     defaultValues: {
       full_name: '', staff_type: 'support', designation_en: '', designation_np: '',
       qualification: '', specialization: '', biography_en: '', biography_np: '',
-      photo_url: '', email: '', phone: '', department_id: '', is_published: true,
+      photo_url: '', email: '', phone: '', department_id: '',
+      sort_order: 0, is_published: true,
       schedules: [],
     },
   });
 
   const { fields, append, remove } = useFieldArray({ control, name: 'schedules' });
   const staffType = watch('staff_type');
+  const fullName = watch('full_name');
+  const photoUrl = watch('photo_url');
   const days = t('staff.days', { returnObjects: true });
+
+  // Derived avatar values — recalculate whenever fullName changes
+  const initials = getInitials(fullName);
+  const bgColor = avatarColor(fullName);
 
   useEffect(() => {
     departmentsApi.list({ limit: 100 }).then((res) => setDepartments(res.data.data));
@@ -44,8 +78,11 @@ export default function StaffForm() {
       reset({
         ...data,
         department_id: data.department_id || '',
+        sort_order: data.sort_order ?? 0,
         schedules: (data.schedules || []).map((s) => ({
-          day_of_week: s.day_of_week, start_time: s.start_time?.slice(0, 5), end_time: s.end_time?.slice(0, 5),
+          day_of_week: s.day_of_week,
+          start_time: s.start_time?.slice(0, 5),
+          end_time: s.end_time?.slice(0, 5),
         })),
       });
       setIsLoading(false);
@@ -57,7 +94,12 @@ export default function StaffForm() {
 
   const onSubmit = async (data) => {
     setIsSaving(true);
-    const payload = { ...data, department_id: data.department_id || null };
+    const payload = {
+      ...data,
+      department_id: data.department_id || null,
+      sort_order: Number(data.sort_order) || 0,
+      email: data.email || null,
+    };
     try {
       if (isEdit) {
         await staffApi.update(id, payload);
@@ -84,15 +126,20 @@ export default function StaffForm() {
 
       <form className="surface-card" style={{ padding: 24 }} onSubmit={handleSubmit(onSubmit)}>
         <div className="form-grid">
+
+          {/* ── Name + type ── */}
           <Field label={t('staff.fullName')} required error={errors.full_name?.message}>
             <TextInput {...register('full_name', { required: t('common.required') })} />
           </Field>
           <Field label={t('staff.staffType')} required>
             <Select {...register('staff_type')}>
-              {STAFF_TYPES.map((value) => <option key={value} value={value}>{t(`staff.types.${value}`)}</option>)}
+              {STAFF_TYPES.map((value) => (
+                <option key={value} value={value}>{t(`staff.types.${value}`)}</option>
+              ))}
             </Select>
           </Field>
 
+          {/* ── Designation ── */}
           <Field label={t('staff.designationEn')} required error={errors.designation_en?.message}>
             <TextInput {...register('designation_en', { required: t('common.required') })} />
           </Field>
@@ -100,6 +147,7 @@ export default function StaffForm() {
             <TextInput {...register('designation_np', { required: t('common.required') })} />
           </Field>
 
+          {/* ── Department + qualification ── */}
           <Field label={t('staff.department')}>
             <Select {...register('department_id')}>
               <option value="">{t('common.none')}</option>
@@ -110,19 +158,26 @@ export default function StaffForm() {
             <TextInput {...register('qualification')} />
           </Field>
 
+          {/* ── Doctor-only specialization ── */}
           {staffType === 'doctor' && (
             <Field label={t('staff.specialization')} hint={t('staff.specializationHint')}>
               <TextInput {...register('specialization')} />
             </Field>
           )}
 
-          <Field label={t('staff.email')}>
-            <TextInput type="email" {...register('email')} />
+          {/* ── Email (explicitly optional) + phone ── */}
+          <Field label={t('staff.email')} hint={t('common.optional')}>
+            <TextInput
+              type="email"
+              placeholder="example@hospital.gov.np"
+              {...register('email')}
+            />
           </Field>
-          <Field label={t('staff.phone')}>
-            <TextInput {...register('phone')} />
+          <Field label={t('staff.phone')} hint={t('common.optional')}>
+            <TextInput placeholder="98XXXXXXXX" {...register('phone')} />
           </Field>
 
+          {/* ── Biography ── */}
           <Field label={t('staff.biographyEn')} hint={t('common.optional')}>
             <TextArea {...register('biography_en')} />
           </Field>
@@ -130,17 +185,59 @@ export default function StaffForm() {
             <TextArea {...register('biography_np')} />
           </Field>
 
-          <Field label={t('staff.photo')}>
-            <FileUpload value={watch('photo_url')} accept="image/*" onChange={(url) => setValue('photo_url', url)} />
+          {/* ── Sort order ── */}
+          <Field label={t('common.sortOrder')} hint={t('common.sortOrderHint')}>
+            <TextInput
+              type="number"
+              min={0}
+              {...register('sort_order', { valueAsNumber: true })}
+            />
           </Field>
 
+          {/* ── Photo upload with live avatar preview ── */}
+          <Field label={t('staff.photo')} hint={t('staff.photoHint')}>
+            <div className="staff-photo-row">
+              {/* Live avatar: shows the uploaded photo, or initials if no photo */}
+              <div
+                className="staff-avatar-preview"
+                style={{ background: photoUrl ? 'transparent' : bgColor }}
+                title={fullName || 'Avatar preview'}
+              >
+                {photoUrl ? (
+                  <img
+                    src={`${FILE_BASE}${photoUrl}`}
+                    alt={fullName}
+                    className="staff-avatar-img"
+                  />
+                ) : (
+                  <span className="staff-avatar-initials">{initials}</span>
+                )}
+              </div>
+
+              <div className="staff-photo-upload">
+                <FileUpload
+                  value={photoUrl}
+                  accept="image/*"
+                  onChange={(url) => setValue('photo_url', url)}
+                />
+                {!photoUrl && fullName && (
+                  <p className="staff-avatar-hint">
+                    {t('staff.avatarAutoHint', { initials })}
+                  </p>
+                )}
+              </div>
+            </div>
+          </Field>
+
+          {/* ── Publish toggle ── */}
           <div className="form-grid-full">
             <Checkbox label={t('departments.publishedHint')} {...register('is_published')} />
           </div>
         </div>
 
+        {/* ── Weekly schedule ── */}
         <h3 style={{ marginTop: 24 }}>{t('staff.weeklyAvailability')}</h3>
-        <p style={{ color: 'var(--color-text-muted)', fontSize: 13, marginTop: -8 }}>
+        <p style={{ color: 'var(--color-text-muted)', fontSize: 13, marginTop: -8, marginBottom: 12 }}>
           {t('staff.weeklyAvailabilityHint')}
         </p>
 
@@ -158,12 +255,17 @@ export default function StaffForm() {
               <Field label={t('staff.endTime')}>
                 <TextInput type="time" {...register(`schedules.${index}.end_time`)} />
               </Field>
-              <Button type="button" variant="ghost" size="sm" onClick={() => remove(index)} style={{ marginTop: 30 }}>
+              <Button
+                type="button" variant="ghost" size="sm"
+                onClick={() => remove(index)}
+                style={{ marginTop: 30 }}
+              >
                 <Trash2 size={14} />
               </Button>
             </div>
           </div>
         ))}
+
         <Button
           type="button" variant="secondary" size="sm"
           onClick={() => append({ day_of_week: 0, start_time: '09:00', end_time: '17:00' })}
@@ -173,7 +275,9 @@ export default function StaffForm() {
 
         <div className="row-actions" style={{ justifyContent: 'flex-start', marginTop: 24 }}>
           <Button type="submit" isLoading={isSaving}>{t('common.save')}</Button>
-          <Button type="button" variant="secondary" onClick={() => navigate('/staff')}>{t('common.cancel')}</Button>
+          <Button type="button" variant="secondary" onClick={() => navigate('/staff')}>
+            {t('common.cancel')}
+          </Button>
         </div>
       </form>
     </div>

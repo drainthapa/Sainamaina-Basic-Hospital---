@@ -12,7 +12,61 @@ import Pagination from '../../components/Pagination';
 import Button from '../../components/Button';
 import { Pencil, Trash2 } from 'lucide-react';
 
+const FILE_BASE = import.meta.env.VITE_FILE_BASE_URL || 'http://localhost:5000';
 const STAFF_TYPES = ['doctor', 'nursing', 'administrative', 'technical', 'support'];
+
+const AVATAR_COLORS = [
+  '#0956CE', '#0F6E56', '#7C3AED', '#B45309',
+  '#0E7490', '#BE185D', '#15803D', '#9A3412',
+];
+
+function getInitials(name = '') {
+  const HONORIFICS = /^(dr|mr|mrs|ms|prof|er|eng|adv)\.?$/i;
+  const parts = name.trim().split(/\s+/).filter((w) => w && !HONORIFICS.test(w));
+  if (parts.length === 0) return '?';
+  if (parts.length === 1) return parts[0][0].toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
+
+function avatarColor(name = '') {
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) hash = (hash * 31 + name.charCodeAt(i)) >>> 0;
+  return AVATAR_COLORS[hash % AVATAR_COLORS.length];
+}
+
+function StaffAvatar({ row }) {
+  if (row.photo_url) {
+    return (
+      <img
+        className="cell-thumb"
+        src={`${FILE_BASE}${row.photo_url}`}
+        alt={row.full_name}
+        style={{ borderRadius: '50%', objectFit: 'cover' }}
+      />
+    );
+  }
+  const initials = getInitials(row.full_name);
+  const bg = avatarColor(row.full_name);
+  return (
+    <div
+      className="cell-thumb"
+      style={{
+        borderRadius: '50%',
+        background: bg,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        color: '#fff',
+        fontWeight: 700,
+        fontSize: 13,
+        letterSpacing: '0.5px',
+        flexShrink: 0,
+      }}
+    >
+      {initials}
+    </div>
+  );
+}
 
 export default function StaffList() {
   const navigate = useNavigate();
@@ -42,9 +96,7 @@ export default function StaffList() {
   const columns = [
     {
       key: 'photo_url', label: '', width: '56px',
-      render: (row) => (row.photo_url
-        ? <img className="cell-thumb" src={`${import.meta.env.VITE_FILE_BASE_URL || 'http://localhost:5000'}${row.photo_url}`} alt="" />
-        : <div className="cell-thumb" />),
+      render: (row) => <StaffAvatar row={row} />,
     },
     { key: 'full_name', label: t('staff.fullName') },
     { key: 'designation_en', label: t('staff.designationEn') },
